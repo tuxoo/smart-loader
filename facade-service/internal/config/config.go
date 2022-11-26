@@ -14,7 +14,8 @@ const (
 
 type (
 	Config struct {
-		HTTP HTTPConfig
+		HTTP     HTTPConfig
+		Postgres PostgresConfig
 	}
 
 	HTTPConfig struct {
@@ -69,6 +70,10 @@ func parseEnv() error {
 		return err
 	}
 
+	if err := parsePostgresEnv(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -80,8 +85,37 @@ func parseHttpEnv() error {
 	return viper.BindEnv("http.port", "HTTP_PORT")
 }
 
+func parsePostgresEnv() error {
+
+	if err := viper.BindEnv("postgres.host", "POSTGRES_HOST"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.port", "POSTGRES_PORT"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.db", "POSTGRES_DB"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.user", "POSTGRES_USER"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.password", "POSTGRES_PASSWORD"); err != nil {
+		return err
+	}
+
+	return viper.BindEnv("postgres.sslmode", "POSTGRES_SSLMODE")
+}
+
 func unmarshalConfig(cfg *Config) error {
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("postgres", &cfg.Postgres); err != nil {
 		return err
 	}
 
@@ -91,4 +125,10 @@ func unmarshalConfig(cfg *Config) error {
 func setFromEnv(cfg *Config) {
 	cfg.HTTP.Host = viper.GetString("http.host")
 	cfg.HTTP.Port = viper.GetString("http.port")
+
+	cfg.Postgres.Host = viper.GetString("postgres.host")
+	cfg.Postgres.Port = viper.GetUint("postgres.port")
+	cfg.Postgres.DB = viper.GetString("postgres.db")
+	cfg.Postgres.User = viper.GetString("postgres.user")
+	cfg.Postgres.Password = viper.GetString("postgres.password")
 }
