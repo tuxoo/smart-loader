@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	path                      = "config/config"
 	defaultHttpPort           = "9000"
 	defaultHttpRWTimeout      = 10 * time.Second
 	defaultMaxHeaderMegabytes = 1
@@ -27,7 +28,7 @@ type (
 	}
 )
 
-func NewConfig(path string) (*Config, error) {
+func NewConfig() (*Config, error) {
 	viper.AutomaticEnv()
 	preDefaults()
 

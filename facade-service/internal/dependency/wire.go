@@ -1,16 +1,16 @@
 //go:build wireinject
 // +build wireinject
 
-package main
+package dependency
 
 import (
 	"github.com/google/wire"
-	"github.com/tuxoo/smart-loader/facade-service/internal/controller/http"
+	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 )
 
-func InitHandler() (*http.Handler, error) {
+func InitConfig() (*config.Config, error) {
 	wire.Build(
-		http.NewHandler,
+		config.NewConfig,
 	)
-	return &http.Handler{}, nil
+	return &config.Config{}, nil
 }

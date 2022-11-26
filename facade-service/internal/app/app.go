@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/controller/http"
+	"github.com/tuxoo/smart-loader/facade-service/internal/dependency"
 	"github.com/tuxoo/smart-loader/facade-service/internal/server"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-func Run(configPath string) {
+func Run() {
 	fmt.Println(`
  ####~~##~~~#~~####~~#####~~######~~~~##~~~~~~####~~~####~~#####~~#####~#####
 ##~~~~~###~##~##~~##~##~~##~~~##~~~~~~##~~~~~##~~##~##~~##~##~~##~##~~~~##~~##
@@ -20,7 +22,7 @@ func Run(configPath string) {
  ####~~##~~~#~##~~##~##~~##~~~##~~~~~~######~~####~~##~~##~#####~~#####~##~~##
 	`)
 
-	cfg, err := config.NewConfig(configPath)
+	cfg, err := dependency.InitConfig()
 	if err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
@@ -41,7 +43,7 @@ func Run(configPath string) {
 	}
 	defer postgresDB.Close()
 
-	httpHandlers := InitHa
+	httpHandlers := http.NewHandler()
 	httpServer := server.NewHTTPServer(cfg, httpHandlers.Init(cfg.HTTP))
 
 	go func() {
