@@ -52,7 +52,7 @@ func (h *Handler) Init(cfg config.HTTPConfig) *gin.Engine {
 func (h *Handler) initApi(router *gin.Engine) {
 	api := router.Group("/api/v1")
 	{
-		h.initLoadRoutes(api)
+		h.initJobRoutes(api)
 	}
 }
 

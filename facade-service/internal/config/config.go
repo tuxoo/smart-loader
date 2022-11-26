@@ -27,7 +27,7 @@ type (
 	}
 )
 
-func InitConfig(path string) (*Config, error) {
+func NewConfig(path string) (*Config, error) {
 	viper.AutomaticEnv()
 	preDefaults()
 
