@@ -7,7 +7,9 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/controller/http"
 	"github.com/tuxoo/smart-loader/facade-service/internal/dependency"
+	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
 	"github.com/tuxoo/smart-loader/facade-service/internal/server"
+	"github.com/tuxoo/smart-loader/facade-service/internal/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -27,7 +29,7 @@ func Run() {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
 
-	postgresDB, err := config.NewPostgresPool(config.PostgresConfig{
+	db, err := config.NewPostgresPool(config.PostgresConfig{
 		Host:            cfg.Postgres.Host,
 		Port:            cfg.Postgres.Port,
 		DB:              cfg.Postgres.DB,
@@ -41,9 +43,15 @@ func Run() {
 	if err != nil {
 		logrus.Fatalf("error initializing postgres: %s", err.Error())
 	}
-	defer postgresDB.Close()
+	defer db.Close()
 
-	httpHandlers := http.NewHandler()
+	repositories := repository.NewRepositories(db)
+
+	services := service.NewServices(service.ServicesDeps{
+		Repositories: repositories,
+	})
+
+	httpHandlers := http.NewHandler(services.JobService)
 	httpServer := server.NewHTTPServer(cfg, httpHandlers.Init(cfg.HTTP))
 
 	go func() {

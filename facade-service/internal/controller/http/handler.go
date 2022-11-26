@@ -8,15 +8,19 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/swag/example/basic/docs"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/service"
 	"net/http"
 	"time"
 )
 
 type Handler struct {
+	jobService service.IJobService
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(jobService service.IJobService) *Handler {
+	return &Handler{
+		jobService: jobService,
+	}
 }
 
 func (h *Handler) Init(cfg config.HTTPConfig) *gin.Engine {

@@ -2,7 +2,6 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -21,7 +20,13 @@ func (h *Handler) loadJob(c *gin.Context) {
 		return
 	}
 
-	logrus.Print(uris)
+	jobStatus, err := h.jobService.Create(c.Request.Context(), uris)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusCreated, jobStatus)
 }
 
 func (h *Handler) getJobStatus(c *gin.Context) {
