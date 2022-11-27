@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/controller/http"
@@ -44,6 +45,13 @@ func Run() {
 		logrus.Fatalf("error initializing postgres: %s", err.Error())
 	}
 	defer db.Close()
+
+	nc, err := nats.Connect("nats://host.docker.internal:4222")
+	if err != nil {
+		logrus.Fatalf("error initializing nats: %s", err.Error())
+	}
+
+	err = nc.Publish("foo", []byte("Hello World"))
 
 	repositories := repository.NewRepositories(db)
 

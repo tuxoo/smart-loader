@@ -17,6 +17,7 @@ type (
 	Config struct {
 		HTTP     HTTPConfig
 		Postgres PostgresConfig
+		Nats     NatsConfig
 	}
 
 	HTTPConfig struct {
@@ -25,6 +26,11 @@ type (
 		ReadTimeout        time.Duration `mapstructure:"readTimeout"`
 		WriteTimeout       time.Duration `mapstructure:"writeTimeout"`
 		MaxHeaderMegabytes int           `mapstructure:"maxHeaderMegabytes"`
+	}
+
+	NatsConfig struct {
+		Port string `mapstructure:"port"`
+		URL  string `mapstructure:"uri"`
 	}
 )
 
@@ -75,6 +81,10 @@ func parseEnv() error {
 		return err
 	}
 
+	if err := parseNatsEnv(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -87,7 +97,6 @@ func parseHttpEnv() error {
 }
 
 func parsePostgresEnv() error {
-
 	if err := viper.BindEnv("postgres.host", "POSTGRES_HOST"); err != nil {
 		return err
 	}
@@ -111,12 +120,24 @@ func parsePostgresEnv() error {
 	return viper.BindEnv("postgres.sslmode", "POSTGRES_SSLMODE")
 }
 
+func parseNatsEnv() error {
+	if err := viper.BindEnv("nats.port", "NATS_PORT"); err != nil {
+		return err
+	}
+
+	return viper.BindEnv("nats.url", "NATS_URL")
+}
+
 func unmarshalConfig(cfg *Config) error {
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
 		return err
 	}
 
 	if err := viper.UnmarshalKey("postgres", &cfg.Postgres); err != nil {
+		return err
+	}
+
+	if err := viper.UnmarshalKey("nats", &cfg.Nats); err != nil {
 		return err
 	}
 
@@ -132,4 +153,7 @@ func setFromEnv(cfg *Config) {
 	cfg.Postgres.DB = viper.GetString("postgres.db")
 	cfg.Postgres.User = viper.GetString("postgres.user")
 	cfg.Postgres.Password = viper.GetString("postgres.password")
+
+	cfg.Nats.URL = viper.GetString("nats.url")
+	cfg.Nats.Port = viper.GetString("nats.port")
 }

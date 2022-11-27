@@ -33,6 +33,17 @@ services:
       smart-loader-net:
         ipv4_address: 172.28.1.2
 
+  nats-smart-loader:
+    container_name: nats-smart-loader
+    image: nats:${NATS_VERSION}
+    restart: on-failure
+    ports:
+      - ${NATS_PORT}:8222
+      - 4222:4222
+    networks:
+      smart-loader-net:
+        ipv4_address: 172.28.1.3
+
 networks:
   smart-loader-net:
     ipam:
