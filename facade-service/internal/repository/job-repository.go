@@ -20,6 +20,7 @@ func NewJobRepository(db *pgxpool.Pool) *JobRepository {
 
 func (r *JobRepository) Save(ctx context.Context, job model.Job) (uuid.UUID, error) {
 	var jobId uuid.UUID
+
 	query := fmt.Sprintf("INSERT INTO %s (name, size, status, created_at) VALUES ($1, $2, $3, $4) RETURNING id", jobTable)
 	row := r.db.QueryRow(ctx, query, job.Name, job.Size, job.Status, job.CreatedAt)
 
