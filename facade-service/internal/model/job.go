@@ -23,5 +23,5 @@ type Job struct {
 	Name      string    `json:"name" db:"name" binding:"required"`
 	Size      int       `json:"size" db:"size" binding:"required"`
 	Status    JobStatus `json:"status" db:"status" binding:"required"`
-	CreatedAt time.Time `json:"createdAt" db:"created_at"`
+	CreatedAt time.Time `json:"createdAt" db:"created_at" binding:"required"`
 }
