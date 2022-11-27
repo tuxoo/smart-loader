@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/tuxoo/smart-loader/facade-service/internal/model"
 )
@@ -18,15 +18,16 @@ func NewJobRepository(db *pgxpool.Pool) *JobRepository {
 	}
 }
 
-func (r *JobRepository) Save(ctx context.Context, job model.Job) (uuid.UUID, error) {
-	var jobId uuid.UUID
+func (r *JobRepository) CreateTransaction(ctx context.Context) (pgx.Tx, error) {
+	return r.db.Begin(ctx)
+}
 
-	query := fmt.Sprintf("INSERT INTO %s (name, size, status, created_at) VALUES ($1, $2, $3, $4) RETURNING id", jobTable)
-	row := r.db.QueryRow(ctx, query, job.Name, job.Size, job.Status, job.CreatedAt)
+func (r *JobRepository) Save(ctx context.Context, tx pgx.Tx, job model.Job) error {
+	query := fmt.Sprintf("INSERT INTO %s (id, name, size, status, created_at) VALUES ($1, $2, $3, $4, $5)", jobTable)
 
-	if err := row.Scan(&jobId); err != nil {
-		return jobId, err
+	if _, err := tx.Exec(ctx, query, job.Id, job.Name, job.Size, job.Status, job.CreatedAt); err != nil {
+		return err
 	}
 
-	return jobId, nil
+	return nil
 }

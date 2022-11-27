@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/tuxoo/smart-loader/facade-service/internal/model"
 	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
 )
@@ -12,7 +13,7 @@ type IJobService interface {
 }
 
 type IJobStageService interface {
-	Create(ctx context.Context, jobId uuid.UUID, uris []string) error
+	Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID, uris []string) error
 }
 
 type Services struct {

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -20,7 +21,7 @@ func (h *Handler) loadJob(c *gin.Context) {
 		return
 	}
 
-	jobStatus, err := h.jobService.Create(c.Request.Context(), uris)
+	jobStatus, err := h.jobService.Create(context.TODO(), uris)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

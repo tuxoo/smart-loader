@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/tuxoo/smart-loader/facade-service/internal/model"
 )
@@ -15,11 +15,12 @@ const (
 )
 
 type IJobRepository interface {
-	Save(ctx context.Context, job model.Job) (uuid.UUID, error)
+	CreateTransaction(ctx context.Context) (pgx.Tx, error)
+	Save(ctx context.Context, tx pgx.Tx, job model.Job) error
 }
 
 type IJobStageRepository interface {
-	Save(ctx context.Context, jobStage model.JobStage) error
+	Save(ctx context.Context, tx pgx.Tx, jobStage model.JobStage) error
 }
 
 type Repositories struct {

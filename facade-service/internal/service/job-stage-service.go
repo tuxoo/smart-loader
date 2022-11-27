@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/tuxoo/smart-loader/facade-service/internal/model"
 	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
 )
@@ -17,7 +18,7 @@ func NewJobStageService(repository repository.IJobStageRepository) *JobStageServ
 	}
 }
 
-func (s *JobStageService) Create(ctx context.Context, jobId uuid.UUID, uris []string) error {
+func (s *JobStageService) Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID, uris []string) error {
 	urisPartitions := partitionUris(uris, 2)
 
 	for _, partition := range urisPartitions {
@@ -29,7 +30,7 @@ func (s *JobStageService) Create(ctx context.Context, jobId uuid.UUID, uris []st
 			JobId:  jobId,
 		}
 
-		if err := s.repository.Save(ctx, jobStage); err != nil {
+		if err := s.repository.Save(ctx, tx, jobStage); err != nil {
 			return err
 		}
 	}
