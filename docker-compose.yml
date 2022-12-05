@@ -38,8 +38,8 @@ services:
     image: nats:${NATS_VERSION}
     restart: on-failure
     ports:
-      - ${NATS_PORT}:8222
-      - 4222:4222
+      - ${NATS_HTTP_PORT}:8222
+      - ${NATS_PORT}:4222
     networks:
       smart-loader-net:
         ipv4_address: 172.28.1.3

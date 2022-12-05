@@ -1,8 +1,9 @@
 package http
 
 import (
-	"github.com/gin-gonic/gin"
+	"encoding/json"
 	"github.com/sirupsen/logrus"
+	"net/http"
 	"time"
 )
 
@@ -15,10 +16,15 @@ type errorResponse struct {
 	Message   string `json:"message" example:"Token is expired"`
 }
 
-func newErrorResponse(c *gin.Context, statusCode int, message string) {
+func newErrorResponse(writer http.ResponseWriter, statusCode int, message string) {
 	logrus.Error(message)
-	c.AbortWithStatusJSON(statusCode, errorResponse{
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(statusCode)
+
+	if err := json.NewEncoder(writer).Encode(errorResponse{
 		ErrorTime: time.Now().Format(timeFormat),
 		Message:   message,
-	})
+	}); err != nil {
+		return
+	}
 }

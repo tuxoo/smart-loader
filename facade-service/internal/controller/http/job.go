@@ -1,35 +1,38 @@
 package http
 
 import (
-	"context"
-	"github.com/gin-gonic/gin"
+	"encoding/json"
 	"net/http"
 )
 
-func (h *Handler) initJobRoutes(api *gin.RouterGroup) {
-	load := api.Group("/job")
-	{
-		load.POST("/", h.loadJob)
-		load.GET("/status", h.getJobStatus)
-	}
-}
+//func (h *Handler) initJobRoutes(api *gin.RouterGroup) {
+//	load := api.Group("/job")
+//	{
+//		load.POST("/", h.loadJob)
+//		load.GET("/status", h.getJobStatus)
+//	}
+//}
 
-func (h *Handler) loadJob(c *gin.Context) {
+func (h *Handler) loadJob(writer http.ResponseWriter, request *http.Request) {
 	var uris []string
-	if err := c.ShouldBindJSON(&uris); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "Invalid input body")
+
+	if err := json.NewDecoder(request.Body).Decode(&uris); err != nil {
+		newErrorResponse(writer, http.StatusBadRequest, "Invalid input body")
 		return
 	}
 
-	jobStatus, err := h.jobService.Create(context.TODO(), uris)
+	jobStatus, err := h.jobService.Create(request.Context(), uris)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(writer, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, jobStatus)
+	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusCreated)
+	if err = json.NewEncoder(writer).Encode(jobStatus); err != nil {
+		return
+	}
 }
 
-func (h *Handler) getJobStatus(c *gin.Context) {
-
+func getJobStatus(writer http.ResponseWriter, request *http.Request) {
 }
