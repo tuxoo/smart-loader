@@ -4,5 +4,6 @@ pkg
 .env
 
 .docker-volumes
+.bin
 
 **/migration/liquibase.properties
