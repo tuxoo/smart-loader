@@ -16,10 +16,12 @@ var configModule = fx.Options(
 	fx.Provide(config.NewHTTPConfig),
 	fx.Provide(config.NewPostgresConfig),
 	fx.Provide(config.NewNatsConfig),
+	fx.Provide(config.NewAppConfig),
 )
 
 var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
+	fx.Invoke(registerPostgresHooks),
 	fx.Provide(repository.NewRepositories),
 )
 
@@ -32,7 +34,6 @@ var App = fx.New(
 	fx.Provide(server.NewHTTPServer),
 	fx.Provide(client.NewNatsClient),
 	fx.Invoke(registerServerHooks),
-	fx.Invoke(registerPostgresHooks),
 	fx.Invoke(registerNatsHooks),
 )
 
@@ -64,13 +65,6 @@ func registerServerHooks(lifecycle fx.Lifecycle, s *server.HTTPServer) {
 func registerPostgresHooks(lifecycle fx.Lifecycle, pool *repository.PostgresDB) {
 	lifecycle.Append(
 		fx.Hook{
-			OnStart: func(ctx context.Context) error {
-				if err := pool.Connect(); err != nil {
-					logrus.Fatalf("error initializing postgres: %s", err.Error())
-					return err
-				}
-				return nil
-			},
 			OnStop: func(context.Context) error {
 				pool.Disconnect()
 				return nil

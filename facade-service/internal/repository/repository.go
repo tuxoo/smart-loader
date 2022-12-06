@@ -13,6 +13,10 @@ const (
 	downloadTable = "download"
 )
 
+type IUserRepository interface {
+	FindByCredentials(ctx context.Context, email, password string) (*model.User, error)
+}
+
 type IJobRepository interface {
 	CreateTransaction(ctx context.Context) (pgx.Tx, error)
 	Save(ctx context.Context, tx pgx.Tx, job model.Job) error
@@ -23,12 +27,14 @@ type IJobStageRepository interface {
 }
 
 type Repositories struct {
+	UserRepository     IUserRepository
 	JobRepository      IJobRepository
 	JobStageRepository IJobStageRepository
 }
 
 func NewRepositories(db *PostgresDB) *Repositories {
 	return &Repositories{
+		UserRepository:     NewUserRepository(db.pool),
 		JobRepository:      NewJobRepository(db.pool),
 		JobStageRepository: NewJobStageRepository(db.pool),
 	}

@@ -18,11 +18,11 @@ func NewNatsConfig() (cfg *NatsConfig) {
 	}
 
 	if err := cfg.parseEnv(); err != nil {
-		logrus.Fatalf("parsing .env error: %s", err.Error())
+		logrus.Fatalf("parsing nats .env error: %s", err.Error())
 	}
 
 	if err := viper.UnmarshalKey("nats", &cfg); err != nil {
-		logrus.Fatalf("unmarshaling configs error: %s", err.Error())
+		logrus.Fatalf("unmarshaling nats configs error: %s", err.Error())
 	}
 
 	cfg.URL = viper.GetString("nats.url")

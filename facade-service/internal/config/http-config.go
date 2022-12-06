@@ -30,11 +30,11 @@ func NewHTTPConfig() (cfg *HTTPConfig) {
 	}
 
 	if err := cfg.parseEnv(); err != nil {
-		logrus.Fatalf("parsing .env error: %s", err.Error())
+		logrus.Fatalf("parsing http .env error: %s", err.Error())
 	}
 
 	if err := viper.UnmarshalKey("http", &cfg); err != nil {
-		logrus.Fatalf("unmarshaling configs error: %s", err.Error())
+		logrus.Fatalf("unmarshaling http configs error: %s", err.Error())
 	}
 
 	cfg.Host = viper.GetString("http.host")

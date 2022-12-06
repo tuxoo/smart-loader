@@ -16,3 +16,6 @@ postgres:
 
 nats:
   port: 4222
+
+app:
+  uriPartitionSize: 3

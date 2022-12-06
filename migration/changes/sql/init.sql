@@ -10,13 +10,18 @@ CREATE TABLE "user"
     visited_at    timestamp           not null
 );
 
+INSERT INTO "user" (name, login_email, password_hash, registered_at, visited_at)
+VALUES ('admin', 'admin@admin', 'qwerty', now(), now());
+
 CREATE TABLE job
 (
     id         uuid default gen_random_uuid() primary key,
-    name       varchar(32) not null,
-    size       bigint      not null,
-    status     varchar(32) not null,
-    created_at timestamp   not null
+    name       varchar(32)                   not null,
+    size       bigint                        not null,
+    status     varchar(32)                   not null,
+    created_at timestamp                     not null,
+    user_id    bigint
+        constraint fk_user references "user" not null
 );
 
 CREATE TABLE job_stage

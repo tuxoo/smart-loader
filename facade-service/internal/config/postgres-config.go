@@ -27,11 +27,11 @@ func NewPostgresConfig() (cfg *PostgresConfig) {
 	}
 
 	if err := cfg.parseEnv(); err != nil {
-		logrus.Fatalf("parsing .env error: %s", err.Error())
+		logrus.Fatalf("parsing postgres .env error: %s", err.Error())
 	}
 
 	if err := viper.UnmarshalKey("postgres", &cfg); err != nil {
-		logrus.Fatalf("unmarshaling configs error: %s", err.Error())
+		logrus.Fatalf("unmarshaling postgres configs error: %s", err.Error())
 	}
 
 	cfg.Host = viper.GetString("postgres.host")

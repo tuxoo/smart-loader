@@ -4,22 +4,25 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
+	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/model"
 	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
 )
 
 type JobStageService struct {
+	cfg        *config.AppConfig
 	repository repository.IJobStageRepository
 }
 
-func NewJobStageService(repository repository.IJobStageRepository) *JobStageService {
+func NewJobStageService(cfg *config.AppConfig, repository repository.IJobStageRepository) *JobStageService {
 	return &JobStageService{
+		cfg:        cfg,
 		repository: repository,
 	}
 }
 
 func (s *JobStageService) Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID, uris []string) error {
-	urisPartitions := partitionUris(uris, 2)
+	urisPartitions := partitionUris(uris, s.cfg.UriPartitionSize)
 
 	for _, partition := range urisPartitions {
 		jobStage := model.JobStage{

@@ -5,25 +5,17 @@ import (
 	"net/http"
 )
 
-//func (h *Handler) initJobRoutes(api *gin.RouterGroup) {
-//	load := api.Group("/job")
-//	{
-//		load.POST("/", h.loadJob)
-//		load.GET("/status", h.getJobStatus)
-//	}
-//}
-
 func (h *Handler) loadJob(writer http.ResponseWriter, request *http.Request) {
 	var uris []string
 
 	if err := json.NewDecoder(request.Body).Decode(&uris); err != nil {
-		newErrorResponse(writer, http.StatusBadRequest, "Invalid input body")
+		newInvalidBodyResponse(writer, err.Error())
 		return
 	}
 
 	jobStatus, err := h.services.JobService.Create(request.Context(), uris)
 	if err != nil {
-		newErrorResponse(writer, http.StatusInternalServerError, err.Error())
+		newInternalServerErrorResponse(writer, err.Error())
 		return
 	}
 
@@ -34,5 +26,5 @@ func (h *Handler) loadJob(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func getJobStatus(writer http.ResponseWriter, request *http.Request) {
+func (h *Handler) getJobStatus(writer http.ResponseWriter, request *http.Request) {
 }

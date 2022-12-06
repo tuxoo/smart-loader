@@ -31,17 +31,23 @@ func NewRouter(handler *Handler) *mux.Router {
 		writer.WriteHeader(http.StatusOK)
 	}).Methods(http.MethodGet)
 
-	handler.initApi(router)
+	handler.initJobRouter(router)
 	//h.initMetrics(router)
 
 	return router
 }
 
-func (h *Handler) initApi(router *mux.Router) {
+func (h *Handler) initJobRouter(router *mux.Router) {
 	api := router.PathPrefix("/api/v1/job").Subrouter()
 
 	api.HandleFunc("", h.loadJob).Methods(http.MethodPost)
-	api.HandleFunc("/status", getJobStatus).Methods(http.MethodGet)
+	api.HandleFunc("/status", h.getJobStatus).Methods(http.MethodGet)
+}
+
+func (h *Handler) initUserRouter(router *mux.Router) {
+	api := router.PathPrefix("/api/v1/user").Subrouter()
+
+	api.HandleFunc("/sign-in", h.signInUser).Methods(http.MethodPost)
 }
 
 //func (h *Handler) initMetrics(router *gin.Engine) {
