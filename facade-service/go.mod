@@ -4,13 +4,12 @@ go 1.19
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/google/wire v0.5.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/kavu/go_reuseport v1.5.0
-	github.com/nats-io/nats.go v1.20.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.14.0
+	go.uber.org/fx v1.18.2
 )
 
 require (
@@ -27,9 +26,6 @@ require (
 	github.com/lib/pq v1.10.7 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/nats-io/nats-server/v2 v2.9.8 // indirect
-	github.com/nats-io/nkeys v0.3.0 // indirect
-	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
@@ -40,7 +36,6 @@ require (
 	github.com/subosito/gotenv v1.4.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/dig v1.15.0 // indirect
-	go.uber.org/fx v1.18.2 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be // indirect
