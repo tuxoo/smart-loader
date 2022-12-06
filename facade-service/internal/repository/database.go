@@ -7,7 +7,12 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 )
 
-func NewPostgresPool(cfg *config.PostgresConfig) *pgxpool.Pool {
+type PostgresDB struct {
+	cfg  *pgxpool.Config
+	pool *pgxpool.Pool
+}
+
+func NewPostgresDB(cfg *config.PostgresConfig) *PostgresDB {
 	pgxConfig, err := pgxpool.ParseConfig("")
 	if err != nil {
 		logrus.Fatalf("parsing postgres configs error: %s", err.Error())
@@ -24,9 +29,21 @@ func NewPostgresPool(cfg *config.PostgresConfig) *pgxpool.Pool {
 	pgxConfig.MaxConnLifetime = cfg.MaxConnLifetime
 	pgxConfig.MaxConnIdleTime = cfg.MaxConnIdleTime
 
-	pool, err := pgxpool.ConnectConfig(context.Background(), pgxConfig)
-	if err != nil {
-		logrus.Fatalf("postgres initializing error: %s", err.Error())
+	return &PostgresDB{
+		cfg: pgxConfig,
 	}
-	return pool
+}
+
+func (p *PostgresDB) Connect() error {
+	if pool, err := pgxpool.ConnectConfig(context.Background(), p.cfg); err != nil {
+		return err
+	} else {
+		p.pool = pool
+	}
+
+	return nil
+}
+
+func (p *PostgresDB) Disconnect() {
+	p.pool.Close()
 }

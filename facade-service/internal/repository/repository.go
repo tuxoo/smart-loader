@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/tuxoo/smart-loader/facade-service/internal/model"
 )
 
@@ -28,9 +27,9 @@ type Repositories struct {
 	JobStageRepository IJobStageRepository
 }
 
-func NewRepositories(db *pgxpool.Pool) *Repositories {
+func NewRepositories(db *PostgresDB) *Repositories {
 	return &Repositories{
-		JobRepository:      NewJobRepository(db),
-		JobStageRepository: NewJobStageRepository(db),
+		JobRepository:      NewJobRepository(db.pool),
+		JobStageRepository: NewJobStageRepository(db.pool),
 	}
 }

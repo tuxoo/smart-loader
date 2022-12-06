@@ -2,7 +2,6 @@ package di
 
 import (
 	"context"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sirupsen/logrus"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/controller/http"
@@ -19,7 +18,7 @@ var configModule = fx.Options(
 )
 
 var repositoryModule = fx.Options(
-	fx.Provide(repository.NewPostgresPool),
+	fx.Provide(repository.NewPostgresDB),
 	fx.Provide(repository.NewRepositories),
 )
 
@@ -38,20 +37,20 @@ func registerServerHooks(lifecycle fx.Lifecycle, s *server.HTTPServer) {
 	lifecycle.Append(
 		fx.Hook{
 			OnStart: func(context.Context) error {
-				// TODO: return error
 				go func() {
-					if err := s.Run(); err != nil {
+					if err := s.Run(); err == nil {
 						logrus.Errorf("error occurred while running http server: %s\n", err.Error())
 					}
 				}()
+
 				logrus.Printf("SMART LOADER facade application has been started [%s]", s.HttpServer.Addr)
 				return nil
 			},
 			OnStop: func(context.Context) error {
-				// TODO: return error
 				logrus.Print("SMART LOADER application is shutting down")
 				if err := s.Shutdown(context.Background()); err != nil {
 					logrus.Errorf("error occured on http server shutting down: %s", err.Error())
+					return err
 				}
 				return nil
 			},
@@ -59,12 +58,18 @@ func registerServerHooks(lifecycle fx.Lifecycle, s *server.HTTPServer) {
 	)
 }
 
-func registerPostgresHooks(lifecycle fx.Lifecycle, pool *pgxpool.Pool) {
+func registerPostgresHooks(lifecycle fx.Lifecycle, pool *repository.PostgresDB) {
 	lifecycle.Append(
 		fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				if err := pool.Connect(); err != nil {
+					logrus.Fatalf("error initializing postgres: %s", err.Error())
+					return err
+				}
+				return nil
+			},
 			OnStop: func(context.Context) error {
-				// TODO: return error
-				pool.Close()
+				pool.Disconnect()
 				return nil
 			},
 		},
