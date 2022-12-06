@@ -7,7 +7,7 @@ tidy:
 clean:
 	go clean -modcache
 
-build-facade:
+build-loader:
 	go build -o ./.bin/app ./cmd/main.go
 
 docker:

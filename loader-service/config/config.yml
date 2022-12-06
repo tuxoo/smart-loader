@@ -1,0 +1,11 @@
+postgres:
+  host: localhost
+  port: 5432
+  dbname: smart_loader
+  maxConns: 25
+  minConns: 2
+  maxConnLifetime: 120s
+  maxConnIdleTime: 300s
+
+nats:
+  port: 4222
