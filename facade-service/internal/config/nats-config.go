@@ -10,15 +10,12 @@ type NatsConfig struct {
 	URL  string `mapstructure:"NATS_URL"`
 }
 
-func NewNatsConfig() *NatsConfig {
+func NewNatsConfig() (cfg *NatsConfig) {
 	viper.AutomaticEnv()
-	preDefaults()
 
 	if err := parseConfigFile(path); err != nil {
 		logrus.Fatalf("parsing configs error: %s", err.Error())
 	}
-
-	var cfg NatsConfig
 
 	if err := cfg.parseEnv(); err != nil {
 		logrus.Fatalf("parsing .env error: %s", err.Error())
@@ -31,7 +28,7 @@ func NewNatsConfig() *NatsConfig {
 	cfg.URL = viper.GetString("nats.url")
 	cfg.Port = viper.GetString("nats.port")
 
-	return &cfg
+	return
 }
 
 func (c *NatsConfig) parseEnv() error {

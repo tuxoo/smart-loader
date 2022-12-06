@@ -19,15 +19,12 @@ type PostgresConfig struct {
 	MaxConnIdleTime time.Duration
 }
 
-func NewPostgresConfig() *PostgresConfig {
+func NewPostgresConfig() (cfg *PostgresConfig) {
 	viper.AutomaticEnv()
-	preDefaults()
 
 	if err := parseConfigFile(path); err != nil {
 		logrus.Fatalf("parsing configs error: %s", err.Error())
 	}
-
-	var cfg PostgresConfig
 
 	if err := cfg.parseEnv(); err != nil {
 		logrus.Fatalf("parsing .env error: %s", err.Error())
@@ -43,7 +40,7 @@ func NewPostgresConfig() *PostgresConfig {
 	cfg.User = viper.GetString("postgres.user")
 	cfg.Password = viper.GetString("postgres.password")
 
-	return &cfg
+	return
 }
 
 func (c *PostgresConfig) parseEnv() error {

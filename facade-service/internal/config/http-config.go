@@ -21,7 +21,7 @@ type HTTPConfig struct {
 	MaxHeaderMegabytes int
 }
 
-func NewHTTPConfig() *HTTPConfig {
+func NewHTTPConfig() (cfg *HTTPConfig) {
 	viper.AutomaticEnv()
 	preDefaults()
 
@@ -29,11 +29,9 @@ func NewHTTPConfig() *HTTPConfig {
 		logrus.Fatalf("parsing configs error: %s", err.Error())
 	}
 
-	var cfg HTTPConfig
-
-	//if err := cfg.parseEnv(); err != nil {
-	//	logrus.Fatalf("parsing .env error: %s", err.Error())
-	//}
+	if err := cfg.parseEnv(); err != nil {
+		logrus.Fatalf("parsing .env error: %s", err.Error())
+	}
 
 	if err := viper.UnmarshalKey("http", &cfg); err != nil {
 		logrus.Fatalf("unmarshaling configs error: %s", err.Error())
@@ -42,7 +40,7 @@ func NewHTTPConfig() *HTTPConfig {
 	cfg.Host = viper.GetString("http.host")
 	cfg.Port = viper.GetString("http.port")
 
-	return &cfg
+	return
 }
 
 func (c *HTTPConfig) parseEnv() error {
