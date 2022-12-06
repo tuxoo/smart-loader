@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/kavu/go_reuseport"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"net/http"
@@ -11,28 +12,28 @@ import (
 const protocol = "tcp"
 
 type HTTPServer struct {
-	httpServer *http.Server
+	HttpServer *http.Server
 }
 
-func NewHTTPServer(cfg *config.Config, handler http.Handler) *HTTPServer {
+func NewHTTPServer(cfg *config.HTTPConfig, mux *mux.Router) *HTTPServer {
 	return &HTTPServer{
-		httpServer: &http.Server{
-			Addr:           fmt.Sprintf(":%s", cfg.HTTP.Port),
-			Handler:        handler,
-			MaxHeaderBytes: cfg.HTTP.MaxHeaderMegabytes << 28,
+		HttpServer: &http.Server{
+			Addr:           fmt.Sprintf(":%s", cfg.Port),
+			Handler:        mux,
+			MaxHeaderBytes: cfg.MaxHeaderMegabytes << 28,
 		},
 	}
 }
 
 func (s *HTTPServer) Run() error {
-	listener, err := reuseport.NewReusablePortListener(protocol, s.httpServer.Addr)
+	listener, err := reuseport.NewReusablePortListener(protocol, s.HttpServer.Addr)
 	if err != nil {
 		return err
 	}
 
-	return s.httpServer.Serve(listener)
+	return s.HttpServer.Serve(listener)
 }
 
 func (s *HTTPServer) Shutdown(ctx context.Context) error {
-	return s.httpServer.Shutdown(ctx)
+	return s.HttpServer.Shutdown(ctx)
 }

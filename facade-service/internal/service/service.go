@@ -21,15 +21,11 @@ type Services struct {
 	JobStageService IJobStageService
 }
 
-type ServicesDeps struct {
-	Repositories *repository.Repositories
-}
-
-func NewServices(deps ServicesDeps) *Services {
-	jobStageService := NewJobStageService(deps.Repositories.JobStageRepository)
+func NewServices(repositories *repository.Repositories) *Services {
+	jobStageService := NewJobStageService(repositories.JobStageRepository)
 
 	return &Services{
-		JobService:      NewJobService(deps.Repositories.JobRepository, jobStageService),
+		JobService:      NewJobService(repositories.JobRepository, jobStageService),
 		JobStageService: jobStageService,
 	}
 }

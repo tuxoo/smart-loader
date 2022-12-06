@@ -2,22 +2,21 @@ package http
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/service"
 	"net/http"
 )
 
 type Handler struct {
-	jobService service.IJobService
+	services *service.Services
 }
 
-func NewHandler(jobService service.IJobService) *Handler {
+func NewHandler(services *service.Services) *Handler {
 	return &Handler{
-		jobService: jobService,
+		services: services,
 	}
 }
 
-func (h *Handler) Init(cfg config.HTTPConfig) *mux.Router {
+func NewRouter(handler *Handler) *mux.Router {
 	router := mux.NewRouter()
 
 	router.Use(
@@ -32,7 +31,7 @@ func (h *Handler) Init(cfg config.HTTPConfig) *mux.Router {
 		writer.WriteHeader(http.StatusOK)
 	}).Methods(http.MethodGet)
 
-	h.initApi(router)
+	handler.initApi(router)
 	//h.initMetrics(router)
 
 	return router

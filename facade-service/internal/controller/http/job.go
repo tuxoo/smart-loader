@@ -21,7 +21,7 @@ func (h *Handler) loadJob(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	jobStatus, err := h.jobService.Create(request.Context(), uris)
+	jobStatus, err := h.services.JobService.Create(request.Context(), uris)
 	if err != nil {
 		newErrorResponse(writer, http.StatusInternalServerError, err.Error())
 		return

@@ -1,9 +1,9 @@
 package config
 
 import (
-	"context"
-	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -19,27 +19,53 @@ type PostgresConfig struct {
 	MaxConnIdleTime time.Duration
 }
 
-func NewPostgresPool(cfg PostgresConfig) (pool *pgxpool.Pool, err error) {
-	config, err := pgxpool.ParseConfig("")
-	if err != nil {
-		return nil, err
+func NewPostgresConfig() *PostgresConfig {
+	viper.AutomaticEnv()
+	preDefaults()
+
+	if err := parseConfigFile(path); err != nil {
+		logrus.Fatalf("parsing configs error: %s", err.Error())
 	}
 
-	config.ConnConfig.Host = cfg.Host
-	config.ConnConfig.Port = uint16(cfg.Port)
-	config.ConnConfig.Database = cfg.DB
-	config.ConnConfig.User = cfg.User
-	config.ConnConfig.Password = cfg.Password
+	var cfg PostgresConfig
 
-	// MaxConns = 25
-	// MinConns = 2
-	// MaxConnLifetime = 120000 * time.Millisecond
-	// MaxConnIdleTime = 5 * time.Second
-	config.MaxConns = cfg.MaxConns
-	config.MinConns = cfg.MinConns
-	config.MaxConnLifetime = cfg.MaxConnLifetime
-	config.MaxConnIdleTime = cfg.MaxConnIdleTime
+	if err := cfg.parseEnv(); err != nil {
+		logrus.Fatalf("parsing .env error: %s", err.Error())
+	}
 
-	pool, err = pgxpool.ConnectConfig(context.Background(), config)
-	return
+	if err := viper.UnmarshalKey("postgres", &cfg); err != nil {
+		logrus.Fatalf("unmarshaling configs error: %s", err.Error())
+	}
+
+	cfg.Host = viper.GetString("postgres.host")
+	cfg.Port = viper.GetUint("postgres.port")
+	cfg.DB = viper.GetString("postgres.db")
+	cfg.User = viper.GetString("postgres.user")
+	cfg.Password = viper.GetString("postgres.password")
+
+	return &cfg
+}
+
+func (c *PostgresConfig) parseEnv() error {
+	if err := viper.BindEnv("postgres.host", "POSTGRES_HOST"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.port", "POSTGRES_PORT"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.db", "POSTGRES_DB"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.user", "POSTGRES_USER"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("postgres.password", "POSTGRES_PASSWORD"); err != nil {
+		return err
+	}
+
+	return viper.BindEnv("postgres.sslmode", "POSTGRES_SSLMODE")
 }
