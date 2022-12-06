@@ -13,3 +13,6 @@ postgres:
   minConns: 2
   maxConnLifetime: 120s
   maxConnIdleTime: 300s
+
+nats:
+  port: 4222

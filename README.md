@@ -5,6 +5,7 @@
 - Liquibase
 - GO 1.19.3
 - Gorilla MUX
+- Uber/FX
 - Nats
 
 For application need EnvFile by Borys Pierov plugin and .env file which contains:
