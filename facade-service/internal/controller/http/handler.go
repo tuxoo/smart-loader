@@ -32,6 +32,7 @@ func NewRouter(handler *Handler) *mux.Router {
 	}).Methods(http.MethodGet)
 
 	handler.initJobRouter(router)
+	handler.initUserRouter(router)
 	//h.initMetrics(router)
 
 	return router
@@ -45,7 +46,7 @@ func (h *Handler) initJobRouter(router *mux.Router) {
 }
 
 func (h *Handler) initUserRouter(router *mux.Router) {
-	api := router.PathPrefix("/api/v1/user").Subrouter()
+	api := router.PathPrefix("/user").Subrouter()
 
 	api.HandleFunc("/sign-in", h.signInUser).Methods(http.MethodPost)
 }

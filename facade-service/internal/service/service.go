@@ -7,6 +7,7 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/model"
 	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
+	"github.com/tuxoo/smart-loader/facade-service/internal/util"
 )
 
 type IUserService interface {
@@ -27,11 +28,15 @@ type Services struct {
 	JobStageService IJobStageService
 }
 
-func NewServices(repositories *repository.Repositories, cfg *config.AppConfig) *Services {
+func NewServices(
+	cfg *config.AppConfig,
+	repositories *repository.Repositories,
+	hasher *util.Hasher,
+) *Services {
 	jobStageService := NewJobStageService(cfg, repositories.JobStageRepository)
 
 	return &Services{
-		UserService:     NewUserService(repositories.UserRepository),
+		UserService:     NewUserService(repositories.UserRepository, hasher),
 		JobService:      NewJobService(repositories.JobRepository, jobStageService),
 		JobStageService: jobStageService,
 	}

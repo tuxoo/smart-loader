@@ -9,6 +9,7 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
 	"github.com/tuxoo/smart-loader/facade-service/internal/server"
 	"github.com/tuxoo/smart-loader/facade-service/internal/service"
+	"github.com/tuxoo/smart-loader/facade-service/internal/util"
 	"go.uber.org/fx"
 )
 
@@ -21,18 +22,23 @@ var configModule = fx.Options(
 
 var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
-	fx.Invoke(registerPostgresHooks),
 	fx.Provide(repository.NewRepositories),
+)
+
+var utilModule = fx.Options(
+	fx.Provide(util.NewHasher),
 )
 
 var App = fx.New(
 	configModule,
 	repositoryModule,
+	utilModule,
 	fx.Provide(service.NewServices),
 	fx.Provide(http.NewHandler),
 	fx.Provide(http.NewRouter),
 	fx.Provide(server.NewHTTPServer),
 	fx.Provide(client.NewNatsClient),
+	fx.Invoke(registerPostgresHooks),
 	fx.Invoke(registerServerHooks),
 	fx.Invoke(registerNatsHooks),
 )

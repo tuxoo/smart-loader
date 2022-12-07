@@ -11,7 +11,7 @@ CREATE TABLE "user"
 );
 
 INSERT INTO "user" (name, login_email, password_hash, registered_at, visited_at)
-VALUES ('admin', 'admin@admin', 'qwerty', now(), now());
+VALUES ('admin', 'admin@admin', '326236336132646265e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5', now(), now());
 
 CREATE TABLE job
 (
