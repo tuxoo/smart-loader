@@ -4,10 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
-	"github.com/tuxoo/smart-loader/facade-service/internal/model"
-	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
-	"github.com/tuxoo/smart-loader/facade-service/internal/util"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
 )
 
 type IUserService interface {
@@ -15,7 +12,7 @@ type IUserService interface {
 }
 
 type IJobService interface {
-	Create(ctx context.Context, uris []string) (model.JobStatusDto, error)
+	Create(ctx context.Context, userId int, uris []string) (*model.JobStatusDto, error)
 }
 
 type IJobStageService interface {
@@ -26,18 +23,4 @@ type Services struct {
 	UserService     IUserService
 	JobService      IJobService
 	JobStageService IJobStageService
-}
-
-func NewServices(
-	cfg *config.AppConfig,
-	repositories *repository.Repositories,
-	hasher *util.Hasher,
-) *Services {
-	jobStageService := NewJobStageService(cfg, repositories.JobStageRepository)
-
-	return &Services{
-		UserService:     NewUserService(repositories.UserRepository, hasher),
-		JobService:      NewJobService(repositories.JobRepository, jobStageService),
-		JobStageService: jobStageService,
-	}
 }

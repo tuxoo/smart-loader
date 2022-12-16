@@ -29,15 +29,20 @@ func NewPostgresDB(cfg *config.PostgresConfig) *PostgresDB {
 	pgxConfig.MaxConnLifetime = cfg.MaxConnLifetime
 	pgxConfig.MaxConnIdleTime = cfg.MaxConnIdleTime
 
-	pool, err := pgxpool.ConnectConfig(context.Background(), pgxConfig)
+	return &PostgresDB{
+		cfg: pgxConfig,
+	}
+}
+
+func (p *PostgresDB) Connect(ctx context.Context) error {
+	pool, err := pgxpool.ConnectConfig(ctx, p.cfg)
 	if err != nil {
 		logrus.Fatalf("error occured on connecting to postgres: %s", err.Error())
+	} else {
+		p.pool = pool
 	}
 
-	return &PostgresDB{
-		cfg:  pgxConfig,
-		pool: pool,
-	}
+	return nil
 }
 
 func (p *PostgresDB) Disconnect() {

@@ -4,7 +4,7 @@ import "time"
 
 type SignInDTO struct {
 	Email    string `json:"email" binding:"required,email,max=64"`
-	Password string `json:"password" binding:"required,min=6,max=64"`
+	Password string `json:"password" binding:"required,min=5,max=64"`
 }
 
 type User struct {

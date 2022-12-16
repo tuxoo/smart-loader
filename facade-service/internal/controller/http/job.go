@@ -1,30 +1,41 @@
 package http
 
 import (
-	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func (h *Handler) loadJob(writer http.ResponseWriter, request *http.Request) {
-	var uris []string
+func (h *Handler) initJobRoutes(api *gin.RouterGroup) {
 
-	if err := json.NewDecoder(request.Body).Decode(&uris); err != nil {
-		newInvalidBodyResponse(writer, err.Error())
-		return
-	}
-
-	jobStatus, err := h.services.JobService.Create(request.Context(), uris)
-	if err != nil {
-		newInternalServerErrorResponse(writer, err.Error())
-		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusCreated)
-	if err = json.NewEncoder(writer).Encode(jobStatus); err != nil {
-		return
+	load := api.Group("/job", h.userIdentity)
+	{
+		load.POST("/", h.loadJob)
+		load.GET("/status", h.getJobStatus)
 	}
 }
 
-func (h *Handler) getJobStatus(writer http.ResponseWriter, request *http.Request) {
+func (h *Handler) loadJob(c *gin.Context) {
+	var uris []string
+	if err := c.ShouldBindJSON(&uris); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "Invalid input body")
+		return
+	}
+
+	userId, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "Unauthorized user")
+		return
+	}
+
+	jobStatus, err := h.jobService.Create(c.Request.Context(), userId, uris)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusCreated, jobStatus)
+}
+
+func (h *Handler) getJobStatus(c *gin.Context) {
+
 }

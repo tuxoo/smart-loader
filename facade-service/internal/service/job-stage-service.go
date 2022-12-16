@@ -5,8 +5,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
-	"github.com/tuxoo/smart-loader/facade-service/internal/model"
-	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
+	model2 "github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/repository"
 )
 
 type JobStageService struct {
@@ -25,11 +25,11 @@ func (s *JobStageService) Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID
 	urisPartitions := partitionUris(uris, s.cfg.UriPartitionSize)
 
 	for _, partition := range urisPartitions {
-		jobStage := model.JobStage{
+		jobStage := model2.JobStage{
 			Id:     uuid.New(),
 			Size:   len(partition),
 			Uris:   partition,
-			Status: model.NEW,
+			Status: model2.NEW,
 			JobId:  jobId,
 		}
 

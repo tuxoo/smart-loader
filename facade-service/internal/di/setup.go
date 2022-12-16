@@ -6,10 +6,8 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/client"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/controller/http"
-	"github.com/tuxoo/smart-loader/facade-service/internal/repository"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/repository"
 	"github.com/tuxoo/smart-loader/facade-service/internal/server"
-	"github.com/tuxoo/smart-loader/facade-service/internal/service"
-	"github.com/tuxoo/smart-loader/facade-service/internal/util"
 	"go.uber.org/fx"
 )
 
@@ -22,20 +20,28 @@ var configModule = fx.Options(
 
 var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
-	fx.Provide(repository.NewRepositories),
+	fx.Provide(provideUserRepository),
+	fx.Provide(provideJobRepository),
+	fx.Provide(provideJobStageRepository),
+)
+
+var serviceModule = fx.Options(
+	fx.Provide(provideUserService),
+	fx.Provide(provideJobService),
+	fx.Provide(provideJobStageService),
 )
 
 var utilModule = fx.Options(
-	fx.Provide(util.NewHasher),
+	fx.Provide(provideHasher),
+	fx.Provide(provideTokenManager),
 )
 
 var App = fx.New(
 	configModule,
 	repositoryModule,
+	serviceModule,
 	utilModule,
-	fx.Provide(service.NewServices),
 	fx.Provide(http.NewHandler),
-	fx.Provide(http.NewRouter),
 	fx.Provide(server.NewHTTPServer),
 	fx.Provide(client.NewNatsClient),
 	fx.Invoke(registerPostgresHooks),
@@ -46,7 +52,7 @@ var App = fx.New(
 func registerServerHooks(lifecycle fx.Lifecycle, s *server.HTTPServer) {
 	lifecycle.Append(
 		fx.Hook{
-			OnStart: func(context.Context) error {
+			OnStart: func(_ context.Context) error {
 				go func() {
 					if err := s.Run(); err == nil {
 						logrus.Errorf("error occurred while running http server: %s\n", err.Error())
@@ -56,9 +62,9 @@ func registerServerHooks(lifecycle fx.Lifecycle, s *server.HTTPServer) {
 				logrus.Printf("SMART LOADER facade application has been started [%s]", s.HttpServer.Addr)
 				return nil
 			},
-			OnStop: func(context.Context) error {
+			OnStop: func(ctx context.Context) error {
 				logrus.Print("SMART LOADER application is shutting down")
-				if err := s.Shutdown(context.Background()); err != nil {
+				if err := s.Shutdown(ctx); err != nil {
 					logrus.Errorf("error occured on http server shutting down: %s", err.Error())
 					return err
 				}
@@ -71,7 +77,15 @@ func registerServerHooks(lifecycle fx.Lifecycle, s *server.HTTPServer) {
 func registerPostgresHooks(lifecycle fx.Lifecycle, pool *repository.PostgresDB) {
 	lifecycle.Append(
 		fx.Hook{
-			OnStop: func(context.Context) error {
+			OnStart: func(ctx context.Context) error {
+				err := pool.Connect(ctx)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			},
+			OnStop: func(_ context.Context) error {
 				pool.Disconnect()
 				return nil
 			},
@@ -82,7 +96,7 @@ func registerPostgresHooks(lifecycle fx.Lifecycle, pool *repository.PostgresDB) 
 func registerNatsHooks(lifecycle fx.Lifecycle, client *client.NatsClient) {
 	lifecycle.Append(
 		fx.Hook{
-			OnStart: func(ctx context.Context) error {
+			OnStart: func(_ context.Context) error {
 				if err := client.Connect(); err != nil {
 					logrus.Fatalf("error connecting nats: %s", err.Error())
 					return err

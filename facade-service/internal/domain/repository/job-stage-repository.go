@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/tuxoo/smart-loader/facade-service/internal/model"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
 )
 
 type JobStageRepository struct {
-	db *pgxpool.Pool
+	db *PostgresDB
 }
 
-func NewJobStageRepository(db *pgxpool.Pool) *JobStageRepository {
+func NewJobStageRepository(db *PostgresDB) *JobStageRepository {
 	return &JobStageRepository{
 		db: db,
 	}

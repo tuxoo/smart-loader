@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/kavu/go_reuseport"
 	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"net/http"
@@ -15,11 +15,11 @@ type HTTPServer struct {
 	HttpServer *http.Server
 }
 
-func NewHTTPServer(cfg *config.HTTPConfig, mux *mux.Router) *HTTPServer {
+func NewHTTPServer(cfg *config.HTTPConfig, handler *gin.Engine) *HTTPServer {
 	return &HTTPServer{
 		HttpServer: &http.Server{
 			Addr:           fmt.Sprintf(":%s", cfg.Port),
-			Handler:        mux,
+			Handler:        handler,
 			MaxHeaderBytes: cfg.MaxHeaderMegabytes << 28,
 		},
 	}

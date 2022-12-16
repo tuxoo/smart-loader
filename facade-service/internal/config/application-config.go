@@ -3,11 +3,14 @@ package config
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"time"
 )
 
 type AppConfig struct {
 	HashSalt         string
 	UriPartitionSize int
+	TokenTTL         time.Duration
+	SigningKey       string
 }
 
 func NewAppConfig() (cfg *AppConfig) {
@@ -28,6 +31,8 @@ func NewAppConfig() (cfg *AppConfig) {
 
 	cfg.HashSalt = viper.GetString("app.hashSalt")
 	cfg.UriPartitionSize = viper.GetInt("app.uriPartitionSize")
+	cfg.TokenTTL = viper.GetDuration("app.tokenTtl")
+	cfg.SigningKey = viper.GetString("app.signingKey")
 
 	return
 }
@@ -37,5 +42,9 @@ func (c *AppConfig) parseEnv() error {
 		return err
 	}
 
-	return viper.BindEnv("app.uriPartitionSize", "APP_URI_PARTITION_SIZE")
+	if err := viper.BindEnv("app.uriPartitionSize", "APP_URI_PARTITION_SIZE"); err != nil {
+		return err
+	}
+
+	return viper.BindEnv("app.signingKey", "APP_SIGNING_KEY")
 }

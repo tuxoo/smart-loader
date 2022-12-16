@@ -1,59 +1,89 @@
 package http
 
 import (
-	"github.com/gorilla/mux"
+	"fmt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/swag/example/basic/docs"
+	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/service"
+	token_manager "github.com/tuxoo/smart-loader/facade-service/internal/util/token-manager"
 	"net/http"
+	"time"
 )
 
 type Handler struct {
-	services *service.Services
+	userService     service.IUserService
+	jobService      service.IJobService
+	jobStageService service.IJobStageService
+	tokenManager    token_manager.TokenManager
 }
 
-func NewHandler(services *service.Services) *Handler {
-	return &Handler{
-		services: services,
+func NewHandler(
+	cfg *config.HTTPConfig,
+	userService service.IUserService,
+	jobService service.IJobService,
+	jobStageService service.IJobStageService,
+	tokenManager token_manager.TokenManager,
+) *gin.Engine {
+	handler := &Handler{
+		userService:     userService,
+		jobService:      jobService,
+		jobStageService: jobStageService,
+		tokenManager:    tokenManager,
 	}
-}
 
-func NewRouter(handler *Handler) *mux.Router {
-	router := mux.NewRouter()
+	router := gin.New()
+
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
+	}
 
 	router.Use(
-		mux.CORSMethodMiddleware(router),
+		gin.Recovery(),
+		gin.Logger(),
+		cors.New(corsConfig),
 	)
 
-	router.HandleFunc("/ping", func(writer http.ResponseWriter, request *http.Request) {
-		if _, err := writer.Write([]byte("pong")); err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		writer.WriteHeader(http.StatusOK)
-	}).Methods(http.MethodGet)
+	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	handler.initJobRouter(router)
-	handler.initUserRouter(router)
-	//h.initMetrics(router)
+	router.GET("/ping", func(context *gin.Context) {
+		context.String(http.StatusOK, "pong")
+	})
+
+	handler.initMetrics(router)
+	handler.initApi(router)
 
 	return router
 }
 
-func (h *Handler) initJobRouter(router *mux.Router) {
-	api := router.PathPrefix("/api/v1/job").Subrouter()
+func (h *Handler) Init() *gin.Engine {
+	router := gin.New()
 
-	api.HandleFunc("", h.loadJob).Methods(http.MethodPost)
-	api.HandleFunc("/status", h.getJobStatus).Methods(http.MethodGet)
+	h.initMetrics(router)
+	h.initApi(router)
+
+	return router
 }
 
-func (h *Handler) initUserRouter(router *mux.Router) {
-	api := router.PathPrefix("/user").Subrouter()
-
-	api.HandleFunc("/sign-in", h.signInUser).Methods(http.MethodPost)
+func (h *Handler) initApi(router *gin.Engine) {
+	api := router.Group("/api/v1")
+	{
+		h.initJobRoutes(api)
+		h.initUserRoutes(api)
+	}
 }
 
-//func (h *Handler) initMetrics(router *gin.Engine) {
-//	metrics := router.Group("/metrics")
-//	{
-//		h.initMetricRoutes(metrics)
-//	}
-//}
+func (h *Handler) initMetrics(router *gin.Engine) {
+	metrics := router.Group("/metrics")
+	{
+		h.initMetricRoutes(metrics)
+	}
+}

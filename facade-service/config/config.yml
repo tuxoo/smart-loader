@@ -19,3 +19,4 @@ nats:
 
 app:
   uriPartitionSize: 3
+  tokenTtl: 180m
