@@ -36,7 +36,6 @@ func (s *JobService) Create(ctx context.Context, userId int, uris []string) (*mo
 
 	job := model.Job{
 		Id:        uuid.New(),
-		Name:      "TEST",
 		Size:      len(uris),
 		Status:    model.NEW,
 		CreatedAt: time.Now(),

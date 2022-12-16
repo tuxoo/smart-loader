@@ -16,7 +16,6 @@ VALUES ('admin', 'admin@mail.ru', '326236336132646265e84be33532fb784c48129675f9e
 CREATE TABLE job
 (
     id         uuid default gen_random_uuid() primary key,
-    name       varchar(32)                   not null,
     size       bigint                        not null,
     status     varchar(32)                   not null,
     created_at timestamp                     not null,
