@@ -1,11 +1,11 @@
-package di
+package setup
 
 import (
 	"context"
 	"github.com/sirupsen/logrus"
 	"github.com/tuxoo/smart-loader/loader-service/internal/client"
 	"github.com/tuxoo/smart-loader/loader-service/internal/config"
-	"github.com/tuxoo/smart-loader/loader-service/internal/repository"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/repository"
 	"go.uber.org/fx"
 )
 
@@ -16,13 +16,19 @@ var configModule = fx.Options(
 
 var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
-	fx.Provide(repository.NewRepositories),
+	fx.Provide(provideJobRepository),
+	fx.Provide(provideJobStageRepository),
+)
+
+var serviceModule = fx.Options(
+	fx.Provide(provideJobService),
+	fx.Provide(provideJobStageService),
 )
 
 var App = fx.New(
 	configModule,
 	repositoryModule,
-	//fx.Provide(service.NewServices),
+	serviceModule,
 	fx.Provide(client.NewNatsClient),
 	fx.Invoke(registerPostgresHooks),
 	fx.Invoke(registerNatsHooks),
@@ -32,13 +38,14 @@ func registerPostgresHooks(lifecycle fx.Lifecycle, pool *repository.PostgresDB) 
 	lifecycle.Append(
 		fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				if err := pool.Connect(); err != nil {
-					logrus.Fatalf("error initializing postgres: %s", err.Error())
+				err := pool.Connect(ctx)
+				if err != nil {
 					return err
 				}
+
 				return nil
 			},
-			OnStop: func(context.Context) error {
+			OnStop: func(_ context.Context) error {
 				pool.Disconnect()
 				return nil
 			},
@@ -49,7 +56,7 @@ func registerPostgresHooks(lifecycle fx.Lifecycle, pool *repository.PostgresDB) 
 func registerNatsHooks(lifecycle fx.Lifecycle, client *client.NatsClient) {
 	lifecycle.Append(
 		fx.Hook{
-			OnStart: func(ctx context.Context) error {
+			OnStart: func(_ context.Context) error {
 				if err := client.Connect(); err != nil {
 					logrus.Fatalf("error connecting nats: %s", err.Error())
 					return err

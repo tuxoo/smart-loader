@@ -5,7 +5,7 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/repository"
 	"github.com/tuxoo/smart-loader/facade-service/internal/util/hasher"
-	token_manager "github.com/tuxoo/smart-loader/facade-service/internal/util/token-manager"
+	"github.com/tuxoo/smart-loader/facade-service/internal/util/token-manager"
 	"strconv"
 )
 

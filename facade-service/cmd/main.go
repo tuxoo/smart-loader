@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/tuxoo/smart-loader/facade-service/internal/di"
+	"github.com/tuxoo/smart-loader/facade-service/internal/setup"
 )
 
 func main() {
@@ -14,5 +14,5 @@ func main() {
   ####~~##~~~#~##~~##~##~~##~~~##~~~~~~######~~####~~##~~##~#####~~#####~##~~##
 	`)
 
-	di.App.Run()
+	setup.App.Run()
 }

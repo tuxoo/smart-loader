@@ -1,4 +1,4 @@
-package di
+package setup
 
 import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/client"

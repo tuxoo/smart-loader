@@ -18,9 +18,3 @@ type IJobService interface {
 type IJobStageService interface {
 	Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID, uris []string) error
 }
-
-type Services struct {
-	UserService     IUserService
-	JobService      IJobService
-	JobStageService IJobStageService
-}

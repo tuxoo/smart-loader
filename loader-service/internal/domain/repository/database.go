@@ -15,7 +15,7 @@ type PostgresDB struct {
 func NewPostgresDB(cfg *config.PostgresConfig) *PostgresDB {
 	pgxConfig, err := pgxpool.ParseConfig("")
 	if err != nil {
-		logrus.Fatalf("parsing postgres configs error: %s", err.Error())
+		logrus.Fatalf("parsing pgx configs error: %s", err.Error())
 	}
 
 	pgxConfig.ConnConfig.Host = cfg.Host
@@ -34,9 +34,10 @@ func NewPostgresDB(cfg *config.PostgresConfig) *PostgresDB {
 	}
 }
 
-func (p *PostgresDB) Connect() error {
-	if pool, err := pgxpool.ConnectConfig(context.Background(), p.cfg); err != nil {
-		return err
+func (p *PostgresDB) Connect(ctx context.Context) error {
+	pool, err := pgxpool.ConnectConfig(ctx, p.cfg)
+	if err != nil {
+		logrus.Fatalf("error occured on connecting to postgres: %s", err.Error())
 	} else {
 		p.pool = pool
 	}
