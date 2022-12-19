@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 	"github.com/tuxoo/smart-loader/loader-service/internal/client"
@@ -11,10 +12,10 @@ const NEW_JOB = "job.new"
 
 type JobHandler struct {
 	client     *client.NatsClient
-	jobService service.IJobService
+	jobService service.IJobStageService
 }
 
-func NewJobHandler(client *client.NatsClient, jobService service.IJobService) *JobHandler {
+func NewJobHandler(client *client.NatsClient, jobService service.IJobStageService) *JobHandler {
 	return &JobHandler{
 		client:     client,
 		jobService: jobService,
@@ -28,7 +29,8 @@ func (h *JobHandler) Handle() error {
 			return
 		}
 
-		if err = h.jobService.ProcessJob(jobId); err != nil {
+		// TODO: context.Background()
+		if err = h.jobService.ProcessStage(context.Background(), jobId); err != nil {
 			return
 		}
 	}); err != nil {

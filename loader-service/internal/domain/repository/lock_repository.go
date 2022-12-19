@@ -1,5 +1,11 @@
 package repository
 
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
 type LockRepository struct {
 	db *PostgresDB
 }
@@ -10,7 +16,29 @@ func NewLockRepository(db *PostgresDB) *LockRepository {
 	}
 }
 
-func (r *LockRepository) ChangeState(types, value string, state bool) error {
+func (r *LockRepository) Lock(ctx context.Context, types, value string) error {
+	query := fmt.Sprintf(`
+	INSERT INTO %s (type, value, expired_at)
+	VALUES ($1, $2, $3)
+	ON CONFLICT ON CONSTRAINT uc_lock_type_value
+	DO NOTHING
+	`, lockTable)
+
+	if _, err := r.db.pool.Exec(ctx, query, types, value, time.Now()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *LockRepository) Unlock(ctx context.Context, types, value string) error {
+	query := fmt.Sprintf(`
+	DELETE FROM %s where type =$1 and value = $2
+	`, lockTable)
+
+	if _, err := r.db.pool.Exec(ctx, query, types, value); err != nil {
+		return err
+	}
 
 	return nil
 }

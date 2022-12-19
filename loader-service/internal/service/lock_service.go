@@ -1,8 +1,8 @@
 package service
 
 import (
+	"context"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/repository"
-	"time"
 )
 
 type LockService struct {
@@ -15,10 +15,20 @@ func NewLockService(repository repository.ILockRepository) *LockService {
 	}
 }
 
-func (s *LockService) TryToLock(types, value string, expiredAt time.Duration) bool {
-	return false
+func (s *LockService) TryToLock(ctx context.Context, types, value string) bool {
+	err := s.repository.Lock(ctx, types, value)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
-func (s *LockService) TryToUnlock(types, value string) bool {
-	return false
+func (s *LockService) TryToUnlock(ctx context.Context, types, value string) bool {
+	err := s.repository.Unlock(ctx, types, value)
+	if err != nil {
+		return false
+	}
+
+	return true
 }

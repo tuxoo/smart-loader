@@ -6,6 +6,6 @@ import (
 	"github.com/tuxoo/smart-loader/loader-service/internal/service"
 )
 
-func provideJobHandler(client *client.NatsClient, jobService service.IJobService) *handler.JobHandler {
+func provideJobHandler(client *client.NatsClient, jobService service.IJobStageService) *handler.JobHandler {
 	return handler.NewJobHandler(client, jobService)
 }

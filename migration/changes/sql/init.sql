@@ -46,6 +46,6 @@ CREATE TABLE lock
     id         uuid                        default gen_random_uuid() primary key,
     type       varchar(15) unique not null,
     value      varchar(63) unique not null,
-    state      boolean            not null default false,
-    expired_at timestamp          not null
+    expired_at timestamp          not null,
+    constraint uc_lock_type_value unique (type, value)
 );

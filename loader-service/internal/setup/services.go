@@ -9,8 +9,8 @@ func provideJobService(repository repository.IJobRepository) service.IJobService
 	return service.NewJobService(repository)
 }
 
-func provideJobStageService(repository repository.IJobStageRepository) service.IJobStageService {
-	return service.NewJobStageService(repository)
+func provideJobStageService(repository repository.IJobStageRepository, lockService service.ILockService) service.IJobStageService {
+	return service.NewJobStageService(repository, lockService)
 }
 
 func provideLockService(repository repository.ILockRepository) service.ILockService {

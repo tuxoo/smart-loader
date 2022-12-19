@@ -1,5 +1,7 @@
 package repository
 
+import "context"
+
 const (
 	lockTable     = "lock"
 	jobTable      = "job"
@@ -14,5 +16,6 @@ type IJobStageRepository interface {
 }
 
 type ILockRepository interface {
-	ChangeState(types, value string, state bool) error
+	Lock(ctx context.Context, types, value string) error
+	Unlock(ctx context.Context, types, value string) error
 }

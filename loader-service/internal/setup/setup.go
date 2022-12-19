@@ -19,7 +19,7 @@ var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
 	fx.Provide(provideJobRepository),
 	fx.Provide(provideJobStageRepository),
-	fx.Provide(provideLockeRepository),
+	fx.Provide(provideLockRepository),
 )
 
 var serviceModule = fx.Options(
