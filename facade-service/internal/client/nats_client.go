@@ -23,7 +23,7 @@ type NatsClient struct {
 
 func NewNatsClient(cfg *config.NatsConfig) *NatsClient {
 	return &NatsClient{
-		url:     fmt.Sprintf("%s:%s", cfg.URL, cfg.Port),
+		url:     fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 		options: nil,
 	}
 }

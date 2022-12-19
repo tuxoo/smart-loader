@@ -15,6 +15,7 @@ import (
 type JobStageService struct {
 	repository      repository.IJobStageRepository
 	downloadService IDownloadService
+	minioService    IMinioService
 	lockService     ILockService
 	downloader      downloader.Downloader
 	hasher          hasher.Hasher
@@ -23,6 +24,7 @@ type JobStageService struct {
 func NewJobStageService(
 	repository repository.IJobStageRepository,
 	downloadService IDownloadService,
+	minioService IMinioService,
 	lockService ILockService,
 	downloader downloader.Downloader,
 	hasher hasher.Hasher,
@@ -31,6 +33,7 @@ func NewJobStageService(
 		repository:      repository,
 		downloadService: downloadService,
 		lockService:     lockService,
+		minioService:    minioService,
 		downloader:      downloader,
 		hasher:          hasher,
 	}

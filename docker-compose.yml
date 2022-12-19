@@ -44,6 +44,22 @@ services:
       smart-loader-net:
         ipv4_address: 172.28.1.3
 
+  minio-smart-loader:
+    container_name: minio-smart-loader
+    image: minio/minio:latest
+    restart: on-failure
+    env_file:
+      - .env
+    command: minio server --console-address ":9001" /data
+    ports:
+      - ${MINIO_PORT}:9000
+      - ${MINIO_PORT_1}:9001
+    volumes:
+      - ./.docker-volumes/minio:/data
+    networks:
+      smart-loader-net:
+        ipv4_address: 172.28.1.4
+
   facade-service:
     container_name: facade-service
     build: ./facade-service
@@ -54,10 +70,10 @@ services:
       - postgres-smart-loader
       - nats-smart-loader
     ports:
-      - ${FACADE_SERVICE_PORT}:9000
+      - ${FACADE_SERVICE_PORT}:8080
     networks:
       smart-loader-net:
-        ipv4_address: 172.28.1.4
+        ipv4_address: 172.28.1.5
 
   loader-service:
     container_name: loader-service
@@ -72,7 +88,7 @@ services:
       - ${LOADER_SERVICE_PORT}:9000
     networks:
       smart-loader-net:
-        ipv4_address: 172.28.1.5
+        ipv4_address: 172.28.1.6
 
 networks:
   smart-loader-net:

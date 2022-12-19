@@ -14,6 +14,7 @@ var configModule = fx.Options(
 	fx.Provide(config.NewAppConfig),
 	fx.Provide(config.NewPostgresConfig),
 	fx.Provide(config.NewNatsConfig),
+	fx.Provide(config.NewMinioConfig),
 )
 
 var repositoryModule = fx.Options(
@@ -28,6 +29,7 @@ var serviceModule = fx.Options(
 	fx.Provide(provideJobService),
 	fx.Provide(provideJobStageService),
 	fx.Provide(provideDownloadService),
+	fx.Provide(provideMinioService),
 	fx.Provide(provideLockService),
 )
 
@@ -47,8 +49,10 @@ var App = fx.New(
 	handlerModule,
 	utilModule,
 	fx.Provide(client.NewNatsClient),
+	fx.Provide(client.NewMinioClient),
 	fx.Invoke(registerNatsHooks),
 	fx.Invoke(registerPostgresHooks),
+	fx.Invoke(registerMinioHooks),
 )
 
 func registerPostgresHooks(lifecycle fx.Lifecycle, pool *repository.PostgresDB) {
@@ -88,6 +92,21 @@ func registerNatsHooks(lifecycle fx.Lifecycle, client *client.NatsClient, handle
 			},
 			OnStop: func(context.Context) error {
 				client.Disconnect()
+				return nil
+			},
+		},
+	)
+}
+
+func registerMinioHooks(lifecycle fx.Lifecycle, client *client.MinioClient) {
+	lifecycle.Append(
+		fx.Hook{
+			OnStart: func(_ context.Context) error {
+				if err := client.Connect(); err != nil {
+					logrus.Fatalf("error connecting minio: %s", err.Error())
+					return err
+				}
+
 				return nil
 			},
 		},

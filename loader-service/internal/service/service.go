@@ -18,6 +18,11 @@ type IDownloadService interface {
 	SaveOne(ctx context.Context, download *model.Download) error
 }
 
+type IMinioService interface {
+	Save() error
+	Get() error
+}
+
 type ILockService interface {
 	TryToLock(ctx context.Context, types, value string) bool
 	TryToUnlock(ctx context.Context, types, value string) bool

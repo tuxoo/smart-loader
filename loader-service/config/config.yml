@@ -12,3 +12,6 @@ nats:
 
 app:
   tt: 22
+
+minio:
+  endpoint:

@@ -7,7 +7,7 @@ import (
 
 type NatsConfig struct {
 	Port string `mapstructure:"NATS_PORT"`
-	URL  string `mapstructure:"NATS_URL"`
+	HOST string `mapstructure:"NATS_HOST"`
 }
 
 func NewNatsConfig() (cfg *NatsConfig) {
@@ -25,7 +25,7 @@ func NewNatsConfig() (cfg *NatsConfig) {
 		logrus.Fatalf("unmarshaling configs error: %s", err.Error())
 	}
 
-	cfg.URL = viper.GetString("nats.url")
+	cfg.HOST = viper.GetString("nats.host")
 	cfg.Port = viper.GetString("nats.port")
 
 	return
@@ -36,5 +36,5 @@ func (c *NatsConfig) parseEnv() error {
 		return err
 	}
 
-	return viper.BindEnv("nats.url", "NATS_URL")
+	return viper.BindEnv("nats.host", "NATS_HOST")
 }
