@@ -1,5 +1,7 @@
 package repository
 
+const jobTable = "job"
+
 type JobRepository struct {
 	db *PostgresDB
 }

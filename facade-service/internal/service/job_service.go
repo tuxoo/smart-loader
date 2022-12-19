@@ -26,8 +26,8 @@ func NewJobService(repository repository.IJobRepository, jobStageService IJobSta
 	}
 }
 
-// TODO: regexp for URIs
-func (s *JobService) Create(ctx context.Context, userId int, uris []string) (*model.JobStatusDto, error) {
+// TODO: regexp for URLs
+func (s *JobService) Create(ctx context.Context, userId int, urls []string) (*model.JobStatusDto, error) {
 	tx, err := s.repository.CreateTransaction(ctx)
 	defer func(tx pgx.Tx, ctx context.Context) {
 		err := tx.Rollback(ctx)
@@ -40,7 +40,7 @@ func (s *JobService) Create(ctx context.Context, userId int, uris []string) (*mo
 
 	job := model.Job{
 		Id:        jobId,
-		Size:      len(uris),
+		Size:      len(urls),
 		Status:    model.NEW,
 		CreatedAt: time.Now(),
 		UserId:    userId,
@@ -51,7 +51,7 @@ func (s *JobService) Create(ctx context.Context, userId int, uris []string) (*mo
 		return nil, err
 	}
 
-	if err = s.jobStageService.Create(ctx, tx, job.Id, uris); err != nil {
+	if err = s.jobStageService.Create(ctx, tx, job.Id, urls); err != nil {
 		return nil, err
 	}
 

@@ -15,8 +15,8 @@ func (h *Handler) initJobRoutes(api *gin.RouterGroup) {
 }
 
 func (h *Handler) loadJob(c *gin.Context) {
-	var uris []string
-	if err := c.ShouldBindJSON(&uris); err != nil {
+	var urls []string
+	if err := c.ShouldBindJSON(&urls); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "Invalid input body")
 		return
 	}
@@ -27,7 +27,7 @@ func (h *Handler) loadJob(c *gin.Context) {
 		return
 	}
 
-	jobStatus, err := h.jobService.Create(c.Request.Context(), userId, uris)
+	jobStatus, err := h.jobService.Create(c.Request.Context(), userId, urls)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

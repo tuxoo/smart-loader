@@ -15,7 +15,7 @@ func NewSHA1Hasher(salt string) *SHA1Hasher {
 	}
 }
 
-func (h *SHA1Hasher) Hash(content string) string {
+func (h *SHA1Hasher) HashString(content string) string {
 	hasher := sha1.New()
 	hasher.Write([]byte(content))
 	return fmt.Sprintf("%x", hasher.Sum([]byte(h.salt)))

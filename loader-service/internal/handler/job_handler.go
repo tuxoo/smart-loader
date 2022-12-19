@@ -30,7 +30,7 @@ func (h *JobHandler) Handle() error {
 		}
 
 		// TODO: context.Background()
-		if err = h.jobService.ProcessStage(context.Background(), jobId); err != nil {
+		if err = h.jobService.ProcessStages(context.Background(), jobId); err != nil {
 			return
 		}
 	}); err != nil {

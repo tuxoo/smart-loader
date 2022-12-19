@@ -24,7 +24,7 @@ func NewUserService(repository repository.IUserRepository, hasher hasher.Hasher,
 }
 
 func (s *UserService) SignIn(ctx context.Context, dto model.SignInDTO) (token string, err error) {
-	user, err := s.repository.FindByCredentials(ctx, dto.Email, s.hasher.Hash(dto.Password))
+	user, err := s.repository.FindByCredentials(ctx, dto.Email, s.hasher.HashString(dto.Password))
 	if err != nil {
 		return
 	}

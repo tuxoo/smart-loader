@@ -9,3 +9,6 @@ postgres:
 
 nats:
   port: 4222
+
+app:
+  tt: 22

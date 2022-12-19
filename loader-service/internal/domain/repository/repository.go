@@ -1,18 +1,21 @@
 package repository
 
-import "context"
-
-const (
-	lockTable     = "lock"
-	jobTable      = "job"
-	jobStageTable = "job_stage"
-	downloadTable = "download"
+import (
+	"context"
+	"github.com/google/uuid"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
 )
 
 type IJobRepository interface {
 }
 
 type IJobStageRepository interface {
+	FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]model.BriefJobStage, error)
+}
+
+type IDownloadRepository interface {
+	FindByHash(ctx context.Context, hash string) (*model.Download, error)
+	SaveOne(ctx context.Context, download *model.Download) error
 }
 
 type ILockRepository interface {

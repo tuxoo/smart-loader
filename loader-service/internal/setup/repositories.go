@@ -13,3 +13,7 @@ func provideJobStageRepository(db *repository.PostgresDB) repository.IJobStageRe
 func provideLockRepository(db *repository.PostgresDB) repository.ILockRepository {
 	return repository.NewLockRepository(db)
 }
+
+func provideDownloadRepository(db *repository.PostgresDB) repository.IDownloadRepository {
+	return repository.NewDownloadRepository(db)
+}

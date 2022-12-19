@@ -11,6 +11,7 @@ import (
 )
 
 var configModule = fx.Options(
+	fx.Provide(config.NewAppConfig),
 	fx.Provide(config.NewPostgresConfig),
 	fx.Provide(config.NewNatsConfig),
 )
@@ -19,12 +20,14 @@ var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
 	fx.Provide(provideJobRepository),
 	fx.Provide(provideJobStageRepository),
+	fx.Provide(provideDownloadRepository),
 	fx.Provide(provideLockRepository),
 )
 
 var serviceModule = fx.Options(
 	fx.Provide(provideJobService),
 	fx.Provide(provideJobStageService),
+	fx.Provide(provideDownloadService),
 	fx.Provide(provideLockService),
 )
 
@@ -32,11 +35,17 @@ var handlerModule = fx.Options(
 	fx.Provide(provideJobHandler),
 )
 
+var utilModule = fx.Options(
+	fx.Provide(provideHasher),
+	fx.Provide(provideDownloader),
+)
+
 var App = fx.New(
 	configModule,
 	repositoryModule,
 	serviceModule,
 	handlerModule,
+	utilModule,
 	fx.Provide(client.NewNatsClient),
 	fx.Invoke(registerNatsHooks),
 	fx.Invoke(registerPostgresHooks),

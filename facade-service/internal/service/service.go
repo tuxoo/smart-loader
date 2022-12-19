@@ -12,9 +12,9 @@ type IUserService interface {
 }
 
 type IJobService interface {
-	Create(ctx context.Context, userId int, uris []string) (*model.JobStatusDto, error)
+	Create(ctx context.Context, userId int, urls []string) (*model.JobStatusDto, error)
 }
 
 type IJobStageService interface {
-	Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID, uris []string) error
+	Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID, urls []string) error
 }

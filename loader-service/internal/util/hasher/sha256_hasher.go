@@ -20,3 +20,9 @@ func (h *SHA256Hasher) HashString(content string) string {
 	hasher.Write([]byte(content))
 	return fmt.Sprintf("%x", hasher.Sum([]byte(h.salt)))
 }
+
+func (h *SHA256Hasher) HashBytes(bytes []byte) string {
+	hasher := sha256.New()
+	hasher.Write(bytes)
+	return fmt.Sprintf("%x", hasher.Sum([]byte(h.salt)))
+}

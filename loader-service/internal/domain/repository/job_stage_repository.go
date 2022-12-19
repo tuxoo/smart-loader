@@ -3,9 +3,12 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
 )
+
+const jobStageTable = "job_stage"
 
 type JobStageRepository struct {
 	db *PostgresDB
@@ -17,10 +20,35 @@ func NewJobStageRepository(db *PostgresDB) *JobStageRepository {
 	}
 }
 
-func (r *JobStageRepository) Save(ctx context.Context, tx pgx.Tx, jobStage model.JobStage) error {
-	query := fmt.Sprintf("INSERT INTO %s (size, uris, status, job_id) VALUES ($1, $2, $3, $4)", jobStageTable)
+func (r *JobStageRepository) FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]model.BriefJobStage, error) {
+	var stages []model.BriefJobStage
 
-	if _, err := tx.Exec(ctx, query, jobStage.Size, jobStage.Uris, jobStage.Status, jobStage.JobId); err != nil {
+	query := fmt.Sprintf(`
+	SELECT id, urls FROM %s WHERE job_id = $1
+	`, jobStageTable)
+	rows, err := r.db.pool.Query(ctx, query, jobId)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var stage model.BriefJobStage
+
+		if err = composeBriefJobStage(&stage, rows); err != nil {
+			return nil, err
+		}
+
+		stages = append(stages, stage)
+	}
+
+	return stages, nil
+}
+
+func composeBriefJobStage(stage *model.BriefJobStage, row pgx.Row) error {
+	if err := row.Scan(
+		&stage.Id,
+		&stage.Urls,
+	); err != nil {
 		return err
 	}
 
