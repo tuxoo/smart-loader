@@ -4,7 +4,7 @@
 - Postgres
 - Liquibase
 - GO 1.19.3
-- Gorilla MUX
+- GIN
 - Uber/FX
 - Nats
 

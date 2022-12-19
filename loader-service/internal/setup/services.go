@@ -12,3 +12,7 @@ func provideJobService(repository repository.IJobRepository) service.IJobService
 func provideJobStageService(repository repository.IJobStageRepository) service.IJobStageService {
 	return service.NewJobStageService(repository)
 }
+
+func provideLockService(repository repository.ILockRepository) service.ILockService {
+	return service.NewLockService(repository)
+}

@@ -18,7 +18,7 @@ import (
 type NatsClient struct {
 	url     string
 	options []nats.Option
-	conn    *nats.Conn
+	Conn    *nats.Conn
 }
 
 func NewNatsClient(cfg *config.NatsConfig) *NatsClient {
@@ -32,11 +32,22 @@ func (c *NatsClient) Connect() error {
 	if connect, err := nats.Connect(c.url, c.options...); err != nil {
 		return err
 	} else {
-		c.conn = connect
+		c.Conn = connect
 	}
+
+	//ch := make(chan *nats.Msg, 64)
+	//_, err := c.conn.ChanSubscribe("foo", ch)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//msg := <-ch
+	//
+	//fmt.Println(string(msg.Data))
+
 	return nil
 }
 
 func (c *NatsClient) Disconnect() {
-	c.conn.Close()
+	c.Conn.Close()
 }

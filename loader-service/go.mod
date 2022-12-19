@@ -3,7 +3,7 @@ module github.com/tuxoo/smart-loader/loader-service
 go 1.19
 
 require (
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/nats-io/nats.go v1.21.0
 	github.com/sirupsen/logrus v1.9.0

@@ -6,8 +6,8 @@ func provideUserRepository(db *repository.PostgresDB) repository.IUserRepository
 	return repository.NewUserRepository(db)
 }
 
-func provideJobRepository(db *repository.PostgresDB) repository.IJobStageRepository {
-	return repository.NewJobStageRepository(db)
+func provideJobRepository(db *repository.PostgresDB) repository.IJobRepository {
+	return repository.NewJobRepository(db)
 }
 
 func provideJobStageRepository(db *repository.PostgresDB) repository.IJobStageRepository {

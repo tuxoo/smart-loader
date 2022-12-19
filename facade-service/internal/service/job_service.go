@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const NEW_JOB = "job.new"
+
 type JobService struct {
 	repository      repository.IJobRepository
 	jobStageService IJobStageService
@@ -34,8 +36,10 @@ func (s *JobService) Create(ctx context.Context, userId int, uris []string) (*mo
 		}
 	}(tx, ctx)
 
+	jobId := uuid.New()
+
 	job := model.Job{
-		Id:        uuid.New(),
+		Id:        jobId,
 		Size:      len(uris),
 		Status:    model.NEW,
 		CreatedAt: time.Now(),
@@ -55,7 +59,12 @@ func (s *JobService) Create(ctx context.Context, userId int, uris []string) (*mo
 		return nil, err
 	}
 
-	err = s.natsClient.Conn.Publish("foo", []byte("Hello World"))
+	binary, err := jobId.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.natsClient.Conn.Publish(NEW_JOB, binary)
 	if err != nil {
 		return nil, err
 	}

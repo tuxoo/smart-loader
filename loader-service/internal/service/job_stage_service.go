@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/repository"
 )
 
@@ -12,4 +13,9 @@ func NewJobStageService(repository repository.IJobStageRepository) *JobStageServ
 	return &JobStageService{
 		repository: repository,
 	}
+}
+
+func (s *JobStageService) ProcessStage(jobId uuid.UUID) error {
+
+	return nil
 }

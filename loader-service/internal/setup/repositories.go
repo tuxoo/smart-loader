@@ -9,3 +9,7 @@ func provideJobRepository(db *repository.PostgresDB) repository.IJobRepository {
 func provideJobStageRepository(db *repository.PostgresDB) repository.IJobStageRepository {
 	return repository.NewJobStageRepository(db)
 }
+
+func provideLockeRepository(db *repository.PostgresDB) repository.ILockRepository {
+	return repository.NewLockRepository(db)
+}
