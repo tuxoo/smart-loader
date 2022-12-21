@@ -20,7 +20,8 @@ type IDownloadService interface {
 }
 
 type IJobStageDownloadService interface {
-	SaveOne(ctx context.Context, tx pgx.Tx, jobStageId int, downloadId uuid.UUID) error
+	Save(ctx context.Context, jobStageId int, downloadId uuid.UUID) error
+	SaveInTransaction(ctx context.Context, tx pgx.Tx, jobStageId int, downloadId uuid.UUID) error
 }
 
 type IMinioService interface {

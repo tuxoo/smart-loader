@@ -23,7 +23,8 @@ type IDownloadRepository interface {
 
 type IJobStageDownloadRepository interface {
 	CreateTransaction(ctx context.Context) (pgx.Tx, error)
-	Save(ctx context.Context, tx pgx.Tx, jobStageId int, downloadId uuid.UUID) error
+	Save(ctx context.Context, jobStageId int, downloadId uuid.UUID) error
+	SaveInTransaction(ctx context.Context, tx pgx.Tx, jobStageId int, downloadId uuid.UUID) error
 }
 
 type ILockRepository interface {

@@ -77,6 +77,7 @@ func (s *JobStageService) processingStage(ctx context.Context, stage *model.Brie
 		}
 
 		if download != nil {
+			_ = s.jobStageDownloadService.Save(ctx, stage.Id, download.Id)
 			continue
 		}
 
@@ -99,7 +100,7 @@ func (s *JobStageService) processingStage(ctx context.Context, stage *model.Brie
 			}
 		}
 
-		if err = s.jobStageDownloadService.SaveOne(ctx, tx, stage.Id, download.Id); err != nil {
+		if err = s.jobStageDownloadService.SaveInTransaction(ctx, tx, stage.Id, download.Id); err != nil {
 			if err = tx.Rollback(ctx); err != nil {
 				return err
 			}

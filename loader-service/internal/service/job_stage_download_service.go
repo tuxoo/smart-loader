@@ -17,6 +17,10 @@ func NewJobStageDownloadService(repository repository.IJobStageDownloadRepositor
 	}
 }
 
-func (s *JobStageDownloadService) SaveOne(ctx context.Context, tx pgx.Tx, jobStageId int, downloadId uuid.UUID) error {
-	return s.repository.Save(ctx, tx, jobStageId, downloadId)
+func (s *JobStageDownloadService) Save(ctx context.Context, jobStageId int, downloadId uuid.UUID) error {
+	return s.repository.Save(ctx, jobStageId, downloadId)
+}
+
+func (s *JobStageDownloadService) SaveInTransaction(ctx context.Context, tx pgx.Tx, jobStageId int, downloadId uuid.UUID) error {
+	return s.repository.SaveInTransaction(ctx, tx, jobStageId, downloadId)
 }
