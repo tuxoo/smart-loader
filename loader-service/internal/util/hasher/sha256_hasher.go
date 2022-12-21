@@ -24,5 +24,5 @@ func (h *SHA256Hasher) HashString(content string) string {
 func (h *SHA256Hasher) HashBytes(bytes []byte) string {
 	hasher := sha256.New()
 	hasher.Write(bytes)
-	return fmt.Sprintf("%x", hasher.Sum([]byte(h.salt)))
+	return fmt.Sprintf("%x", hasher.Sum([]byte(nil)))
 }

@@ -22,6 +22,7 @@ var repositoryModule = fx.Options(
 	fx.Provide(provideJobRepository),
 	fx.Provide(provideJobStageRepository),
 	fx.Provide(provideDownloadRepository),
+	fx.Provide(provideJobStageDownloadRepository),
 	fx.Provide(provideLockRepository),
 )
 
@@ -29,6 +30,7 @@ var serviceModule = fx.Options(
 	fx.Provide(provideJobService),
 	fx.Provide(provideJobStageService),
 	fx.Provide(provideDownloadService),
+	fx.Provide(provideJobStageDownloadService),
 	fx.Provide(provideMinioService),
 	fx.Provide(provideLockService),
 )
@@ -101,8 +103,8 @@ func registerNatsHooks(lifecycle fx.Lifecycle, client *client.NatsClient, handle
 func registerMinioHooks(lifecycle fx.Lifecycle, client *client.MinioClient) {
 	lifecycle.Append(
 		fx.Hook{
-			OnStart: func(_ context.Context) error {
-				if err := client.Connect(); err != nil {
+			OnStart: func(ctx context.Context) error {
+				if err := client.Connect(ctx); err != nil {
 					logrus.Fatalf("error connecting minio: %s", err.Error())
 					return err
 				}

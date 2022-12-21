@@ -20,6 +20,10 @@ func NewJobStageRepository(db *PostgresDB) *JobStageRepository {
 	}
 }
 
+func (r *JobStageRepository) CreateTransaction(ctx context.Context) (pgx.Tx, error) {
+	return r.db.pool.Begin(ctx)
+}
+
 func (r *JobStageRepository) FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]model.BriefJobStage, error) {
 	var stages []model.BriefJobStage
 
@@ -34,7 +38,7 @@ func (r *JobStageRepository) FindAllByJobId(ctx context.Context, jobId uuid.UUID
 	for rows.Next() {
 		var stage model.BriefJobStage
 
-		if err = composeBriefJobStage(&stage, rows); err != nil {
+		if err = scanBriefJobStage(&stage, rows); err != nil {
 			return nil, err
 		}
 
@@ -44,7 +48,7 @@ func (r *JobStageRepository) FindAllByJobId(ctx context.Context, jobId uuid.UUID
 	return stages, nil
 }
 
-func composeBriefJobStage(stage *model.BriefJobStage, row pgx.Row) error {
+func scanBriefJobStage(stage *model.BriefJobStage, row pgx.Row) error {
 	if err := row.Scan(
 		&stage.Id,
 		&stage.Urls,

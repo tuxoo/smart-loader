@@ -7,6 +7,7 @@ import (
 
 type MinioConfig struct {
 	Host      string
+	Port      string
 	AccessKey string
 	SecretKey string
 }
@@ -28,6 +29,7 @@ func NewMinioConfig() (cfg *MinioConfig) {
 	}
 
 	cfg.Host = viper.GetString("minio.host")
+	cfg.Port = viper.GetString("minio.port")
 	cfg.AccessKey = viper.GetString("minio.accessKey")
 	cfg.SecretKey = viper.GetString("minio.secretKey")
 
@@ -38,6 +40,11 @@ func (c *MinioConfig) parseEnv() error {
 	if err := viper.BindEnv("minio.host", "MINIO_HOST"); err != nil {
 		return err
 	}
+
+	if err := viper.BindEnv("minio.port", "MINIO_PORT"); err != nil {
+		return err
+	}
+
 	if err := viper.BindEnv("minio.accessKey", "MINIO_ACCESS_KEY"); err != nil {
 		return err
 	}

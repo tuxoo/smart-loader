@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/repository"
@@ -13,29 +12,32 @@ import (
 )
 
 type JobStageService struct {
-	repository      repository.IJobStageRepository
-	downloadService IDownloadService
-	minioService    IMinioService
-	lockService     ILockService
-	downloader      downloader.Downloader
-	hasher          hasher.Hasher
+	repository              repository.IJobStageRepository
+	downloadService         IDownloadService
+	jobStageDownloadService IJobStageDownloadService
+	minioService            IMinioService
+	lockService             ILockService
+	downloader              downloader.Downloader
+	hasher                  hasher.Hasher
 }
 
 func NewJobStageService(
 	repository repository.IJobStageRepository,
 	downloadService IDownloadService,
+	jobStageDownloadService IJobStageDownloadService,
 	minioService IMinioService,
 	lockService ILockService,
 	downloader downloader.Downloader,
 	hasher hasher.Hasher,
 ) *JobStageService {
 	return &JobStageService{
-		repository:      repository,
-		downloadService: downloadService,
-		lockService:     lockService,
-		minioService:    minioService,
-		downloader:      downloader,
-		hasher:          hasher,
+		repository:              repository,
+		downloadService:         downloadService,
+		jobStageDownloadService: jobStageDownloadService,
+		lockService:             lockService,
+		minioService:            minioService,
+		downloader:              downloader,
+		hasher:                  hasher,
 	}
 }
 
@@ -63,32 +65,49 @@ func (s *JobStageService) ProcessStages(ctx context.Context, jobId uuid.UUID) er
 func (s *JobStageService) processingStage(ctx context.Context, stage *model.BriefJobStage) error {
 	urls := stage.Urls
 	for _, url := range urls {
-		bytes, err := s.downloader.Download(url)
+		content, err := s.downloader.Download(url)
 		if err != nil {
 			return err
 		}
 
-		hash := s.hasher.HashBytes(bytes)
+		hash := s.hasher.HashBytes(content)
 		download, err := s.downloadService.GetByHash(ctx, hash)
 		if err != nil {
-			return err
+			continue
 		}
 
-		if download == nil {
-			download = &model.Download{
-				Id:           uuid.New(),
-				Hash:         hash,
-				DownloadedAt: time.Now(),
-			}
+		if download != nil {
+			continue
+		}
 
-			if err = s.downloadService.SaveOne(ctx, download); err != nil {
+		download = &model.Download{
+			Id:           uuid.New(),
+			Hash:         hash,
+			Size:         len(content),
+			DownloadedAt: time.Now(),
+		}
+
+		if err = s.minioService.Put(ctx, content, download); err != nil {
+			continue
+		}
+
+		tx, err := s.repository.CreateTransaction(ctx)
+
+		if err = s.downloadService.SaveOne(ctx, tx, download); err != nil {
+			if err = tx.Rollback(ctx); err != nil {
 				return err
 			}
 		}
 
-		// TODO: save to Minio
+		if err = s.jobStageDownloadService.SaveOne(ctx, tx, stage.Id, download.Id); err != nil {
+			if err = tx.Rollback(ctx); err != nil {
+				return err
+			}
+		}
 
-		fmt.Println(url, len(bytes))
+		if err = tx.Commit(ctx); err != nil {
+			return err
+		}
 	}
 
 	return nil

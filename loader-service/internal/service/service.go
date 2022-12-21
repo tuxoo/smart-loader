@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
 )
 
@@ -15,11 +16,15 @@ type IJobStageService interface {
 
 type IDownloadService interface {
 	GetByHash(ctx context.Context, hash string) (*model.Download, error)
-	SaveOne(ctx context.Context, download *model.Download) error
+	SaveOne(ctx context.Context, tx pgx.Tx, download *model.Download) error
+}
+
+type IJobStageDownloadService interface {
+	SaveOne(ctx context.Context, tx pgx.Tx, jobStageId int, downloadId uuid.UUID) error
 }
 
 type IMinioService interface {
-	Save() error
+	Put(ctx context.Context, content []byte, download *model.Download) error
 	Get() error
 }
 

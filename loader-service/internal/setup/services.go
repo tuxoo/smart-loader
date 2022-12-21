@@ -15,16 +15,29 @@ func provideJobService(repository repository.IJobRepository) service.IJobService
 func provideJobStageService(
 	repository repository.IJobStageRepository,
 	downloadService service.IDownloadService,
+	jobStageDownloadService service.IJobStageDownloadService,
 	minioService service.IMinioService,
 	lockService service.ILockService,
 	downloader downloader.Downloader,
 	hasher hasher.Hasher,
 ) service.IJobStageService {
-	return service.NewJobStageService(repository, downloadService, minioService, lockService, downloader, hasher)
+	return service.NewJobStageService(
+		repository,
+		downloadService,
+		jobStageDownloadService,
+		minioService,
+		lockService,
+		downloader,
+		hasher,
+	)
 }
 
 func provideDownloadService(repository repository.IDownloadRepository) service.IDownloadService {
 	return service.NewDownloadService(repository)
+}
+
+func provideJobStageDownloadService(repository repository.IJobStageDownloadRepository) service.IJobStageDownloadService {
+	return service.NewJobStageDownloadService(repository)
 }
 
 func provideMinioService(client *client.MinioClient) service.IMinioService {
