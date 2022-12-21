@@ -14,6 +14,7 @@ import (
 type JobStageService struct {
 	repository              repository.IJobStageRepository
 	downloadService         IDownloadService
+	jobService              IJobService
 	jobStageDownloadService IJobStageDownloadService
 	minioService            IMinioService
 	lockService             ILockService
@@ -24,6 +25,7 @@ type JobStageService struct {
 func NewJobStageService(
 	repository repository.IJobStageRepository,
 	downloadService IDownloadService,
+	jobService IJobService,
 	jobStageDownloadService IJobStageDownloadService,
 	minioService IMinioService,
 	lockService ILockService,
@@ -33,6 +35,7 @@ func NewJobStageService(
 	return &JobStageService{
 		repository:              repository,
 		downloadService:         downloadService,
+		jobService:              jobService,
 		jobStageDownloadService: jobStageDownloadService,
 		lockService:             lockService,
 		minioService:            minioService,
@@ -42,6 +45,10 @@ func NewJobStageService(
 }
 
 func (s *JobStageService) ProcessStages(ctx context.Context, jobId uuid.UUID) error {
+	if err := s.jobService.UpdateStatus(ctx, jobId, model.PENDING_STATUS); err != nil {
+		return err
+	}
+
 	stages, err := s.repository.FindAllByJobId(ctx, jobId)
 	if err != nil {
 		return err
@@ -49,7 +56,18 @@ func (s *JobStageService) ProcessStages(ctx context.Context, jobId uuid.UUID) er
 
 	for _, stage := range stages {
 		if ok := s.lockService.TryToLock(ctx, model.JOB_STAGE_LOCK, strconv.Itoa(stage.Id)); ok {
+			if err = s.repository.UpdateStatus(ctx, stage.Id, model.PENDING_STATUS); err != nil {
+				return err
+			}
+
 			if err = s.processingStage(ctx, &stage); err != nil {
+				if err = s.repository.UpdateStatus(ctx, stage.Id, model.FAILED_STATUS); err != nil {
+					return err
+				}
+				return err
+			}
+
+			if err = s.repository.UpdateStatus(ctx, stage.Id, model.EXECUTED_STATUS); err != nil {
 				return err
 			}
 
@@ -63,8 +81,7 @@ func (s *JobStageService) ProcessStages(ctx context.Context, jobId uuid.UUID) er
 }
 
 func (s *JobStageService) processingStage(ctx context.Context, stage *model.BriefJobStage) error {
-	urls := stage.Urls
-	for _, url := range urls {
+	for _, url := range stage.Urls {
 		content, err := s.downloader.Download(url)
 		if err != nil {
 			return err

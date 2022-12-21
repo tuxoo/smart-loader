@@ -8,6 +8,7 @@ import (
 )
 
 type IJobService interface {
+	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 }
 
 type IJobStageService interface {

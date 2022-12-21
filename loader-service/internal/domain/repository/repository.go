@@ -8,10 +8,13 @@ import (
 )
 
 type IJobRepository interface {
+	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 }
 
 type IJobStageRepository interface {
 	CreateTransaction(ctx context.Context) (pgx.Tx, error)
+	UpdateStatus(ctx context.Context, id int, status string) error
+	UpdateStatusInTransaction(ctx context.Context, tx pgx.Tx, id int, status string) error
 	FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]model.BriefJobStage, error)
 }
 

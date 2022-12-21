@@ -15,6 +15,7 @@ func provideJobService(repository repository.IJobRepository) service.IJobService
 func provideJobStageService(
 	repository repository.IJobStageRepository,
 	downloadService service.IDownloadService,
+	jobService service.IJobService,
 	jobStageDownloadService service.IJobStageDownloadService,
 	minioService service.IMinioService,
 	lockService service.ILockService,
@@ -24,6 +25,7 @@ func provideJobStageService(
 	return service.NewJobStageService(
 		repository,
 		downloadService,
+		jobService,
 		jobStageDownloadService,
 		minioService,
 		lockService,

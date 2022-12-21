@@ -7,11 +7,6 @@ import (
 
 type JobStatus string
 
-const (
-	NEW     = "NEW"
-	PENDING = "PENDING"
-)
-
 type JobStatusDto struct {
 	Id        uuid.UUID `json:"id"`
 	Status    JobStatus `json:"status"`
