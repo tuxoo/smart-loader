@@ -5,30 +5,26 @@ import (
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
 )
 
-func scanBriefJobStages(rows pgx.Rows) ([]model.BriefJobStage, error) {
-	var stages []model.BriefJobStage
-
+func scanBriefJobStages(rows pgx.Rows) (stages []model.BriefJobStage, err error) {
 	for rows.Next() {
-		var stage model.BriefJobStage
-
-		if err := scanBriefJobStage(&stage, rows); err != nil {
-			return nil, err
+		stage, err := scanBriefJobStage(rows)
+		if err != nil {
+			return stages, err
 		}
-
 		stages = append(stages, stage)
 	}
 
-	return stages, nil
+	return
 }
 
-func scanBriefJobStage(stage *model.BriefJobStage, row pgx.Row) error {
-	if err := row.Scan(
+func scanBriefJobStage(row pgx.Row) (stage model.BriefJobStage, err error) {
+	if err = row.Scan(
 		&stage.Id,
 		&stage.Urls,
 		&stage.Status,
 	); err != nil {
-		return err
+		return
 	}
 
-	return nil
+	return
 }

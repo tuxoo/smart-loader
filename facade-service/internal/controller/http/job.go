@@ -1,19 +1,17 @@
 package http
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 )
 
 func (h *Handler) initJobRoutes(api *gin.RouterGroup) {
 
-	load := api.Group("/job", h.userIdentity)
+	jobs := api.Group("/job", h.userIdentity)
 	{
-		load.POST("/", h.loadJob)
-		load.GET("/status", h.getJobStatus)
-		load.GET("/download", h.getDownloads)
+		jobs.POST("/", h.loadJob)
+		jobs.GET("/", h.getJobs)
+		jobs.GET("/status", h.getJobStatus)
 	}
 }
 
@@ -30,34 +28,31 @@ func (h *Handler) loadJob(c *gin.Context) {
 		return
 	}
 
-	jobStatus, err := h.jobService.Create(c.Request.Context(), userId, urls)
+	job, err := h.jobService.Create(c.Request.Context(), userId, urls)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, jobStatus)
+	c.JSON(http.StatusCreated, job)
+}
+
+func (h *Handler) getJobs(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "Unauthorized user")
+		return
+	}
+
+	jobs, err := h.jobService.GetAll(c.Request.Context(), userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, jobs)
 }
 
 func (h *Handler) getJobStatus(c *gin.Context) {
 
-}
-
-func (h *Handler) getDownloads(c *gin.Context) {
-	jobId := c.Query("jobId")
-	if jobId == "" {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Sprint("empty field [jobId]"))
-		return
-	}
-
-	id, err := uuid.Parse(jobId)
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Sprint("incorrect field [jobId]"))
-		return
-	}
-
-	_, err = h.jobStageService.GetAllByJobId(c.Request.Context(), id)
-	if err != nil {
-		return
-	}
 }

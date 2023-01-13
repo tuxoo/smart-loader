@@ -46,6 +46,7 @@ func (r *JobStageRepository) FindAllByJobId(ctx context.Context, jobId uuid.UUID
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	return scanBriefJobStages(rows)
 }

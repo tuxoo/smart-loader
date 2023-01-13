@@ -12,7 +12,8 @@ type IUserService interface {
 }
 
 type IJobService interface {
-	Create(ctx context.Context, userId int, urls []string) (*model.JobStatusDto, error)
+	Create(ctx context.Context, userId int, urls []string) (job model.Job, err error)
+	GetAll(ctx context.Context, userId int) ([]model.Job, error)
 }
 
 type IJobStageService interface {

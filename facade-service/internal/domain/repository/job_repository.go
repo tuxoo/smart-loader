@@ -32,3 +32,14 @@ func (r *JobRepository) SaveInTransaction(ctx context.Context, tx pgx.Tx, job mo
 
 	return nil
 }
+
+func (r *JobRepository) FindAll(ctx context.Context, userId int) ([]model.Job, error) {
+	query := fmt.Sprintf("SELECT id, size, status, created_at FROM %s WHERE user_id=$1", jobTable)
+	rows, err := r.db.pool.Query(ctx, query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return scanJobs(rows)
+}

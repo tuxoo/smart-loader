@@ -29,6 +29,7 @@ func (r *DownloadRepository) FindByHash(ctx context.Context, hash string) (*mode
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	if rows.Next() {
 		var download model.Download

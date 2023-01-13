@@ -27,7 +27,7 @@ func NewJobService(repository repository.IJobRepository, jobStageService IJobSta
 }
 
 // TODO: regexp for URLs
-func (s *JobService) Create(ctx context.Context, userId int, urls []string) (*model.JobStatusDto, error) {
+func (s *JobService) Create(ctx context.Context, userId int, urls []string) (job model.Job, err error) {
 	tx, err := s.repository.CreateTransaction(ctx)
 	defer func(tx pgx.Tx, ctx context.Context) {
 		err := tx.Rollback(ctx)
@@ -36,10 +36,8 @@ func (s *JobService) Create(ctx context.Context, userId int, urls []string) (*mo
 		}
 	}(tx, ctx)
 
-	jobId := uuid.New()
-
-	job := model.Job{
-		Id:        jobId,
+	job = model.Job{
+		Id:        uuid.New(),
 		Size:      len(urls),
 		Status:    model.NEW,
 		CreatedAt: time.Now(),
@@ -48,30 +46,25 @@ func (s *JobService) Create(ctx context.Context, userId int, urls []string) (*mo
 
 	err = s.repository.SaveInTransaction(ctx, tx, job)
 	if err != nil {
-		return nil, err
+		return job, err
 	}
 
 	if err = s.jobStageService.Create(ctx, tx, job.Id, urls); err != nil {
-		return nil, err
+		return job, err
 	}
 
 	if err = tx.Commit(ctx); err != nil {
-		return nil, err
+		return job, err
 	}
 
-	binary, err := jobId.MarshalBinary()
+	err = s.natsClient.Conn.Publish(NEW_JOB, []byte(job.Id.String()))
 	if err != nil {
-		return nil, err
+		return job, err
 	}
 
-	err = s.natsClient.Conn.Publish(NEW_JOB, binary)
-	if err != nil {
-		return nil, err
-	}
+	return job, nil
+}
 
-	return &model.JobStatusDto{
-		Id:        job.Id,
-		Status:    job.Status,
-		CreatedAt: job.CreatedAt,
-	}, nil
+func (s *JobService) GetAll(ctx context.Context, userId int) ([]model.Job, error) {
+	return s.repository.FindAll(ctx, userId)
 }
