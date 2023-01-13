@@ -13,3 +13,7 @@ func provideJobRepository(db *repository.PostgresDB) repository.IJobRepository {
 func provideJobStageRepository(db *repository.PostgresDB) repository.IJobStageRepository {
 	return repository.NewJobStageRepository(db)
 }
+
+func provideDownloadRepository(db *repository.PostgresDB) repository.IDownloadRepository {
+	return repository.NewDownloadRepository(db)
+}

@@ -3,7 +3,7 @@ package client
 import (
 	"fmt"
 	"github.com/nats-io/nats.go"
-	"github.com/tuxoo/smart-loader/loader-service/internal/config"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/config"
 )
 
 type NatsClient struct {

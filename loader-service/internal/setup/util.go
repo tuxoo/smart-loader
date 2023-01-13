@@ -1,7 +1,7 @@
 package setup
 
 import (
-	"github.com/tuxoo/smart-loader/loader-service/internal/config"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/config"
 	"github.com/tuxoo/smart-loader/loader-service/internal/util/downloader"
 	"github.com/tuxoo/smart-loader/loader-service/internal/util/hasher"
 )

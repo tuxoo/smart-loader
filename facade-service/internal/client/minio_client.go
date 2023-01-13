@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/config"
-	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/const"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
+	_const "github.com/tuxoo/smart-loader/facade-service/internal/domain/model/const"
 )
 
 type MinioClient struct {

@@ -4,36 +4,48 @@ import (
 	"context"
 	"github.com/sirupsen/logrus"
 	"github.com/tuxoo/smart-loader/facade-service/internal/client"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/controller/http"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/repository"
 	"github.com/tuxoo/smart-loader/facade-service/internal/server"
 	"go.uber.org/fx"
 )
 
 var configModule = fx.Options(
-	fx.Provide(config.NewHTTPConfig),
-	fx.Provide(config.NewPostgresConfig),
-	fx.Provide(config.NewNatsConfig),
-	fx.Provide(config.NewAppConfig),
+	fx.Provide(
+		config.NewHTTPConfig,
+		config.NewPostgresConfig,
+		config.NewNatsConfig,
+		config.NewMinioConfig,
+		config.NewAppConfig,
+	),
 )
 
 var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
-	fx.Provide(provideUserRepository),
-	fx.Provide(provideJobRepository),
-	fx.Provide(provideJobStageRepository),
+	fx.Provide(
+		provideUserRepository,
+		provideJobRepository,
+		provideJobStageRepository,
+		provideDownloadRepository,
+	),
 )
 
 var serviceModule = fx.Options(
-	fx.Provide(provideUserService),
-	fx.Provide(provideJobService),
-	fx.Provide(provideJobStageService),
+	fx.Provide(
+		provideUserService,
+		provideJobService,
+		provideJobStageService,
+		provideDownloadService,
+		provideMinioService,
+	),
 )
 
 var utilModule = fx.Options(
-	fx.Provide(provideHasher),
-	fx.Provide(provideTokenManager),
+	fx.Provide(
+		provideHasher,
+		provideTokenManager,
+	),
 )
 
 var App = fx.New(
@@ -44,9 +56,13 @@ var App = fx.New(
 	fx.Provide(http.NewHandler),
 	fx.Provide(server.NewHTTPServer),
 	fx.Provide(client.NewNatsClient),
-	fx.Invoke(registerPostgresHooks),
-	fx.Invoke(registerServerHooks),
-	fx.Invoke(registerNatsHooks),
+	fx.Provide(client.NewMinioClient),
+	fx.Invoke(
+		registerPostgresHooks,
+		registerServerHooks,
+		registerNatsHooks,
+		registerMinioHooks,
+	),
 )
 
 func registerServerHooks(lifecycle fx.Lifecycle, s *server.HTTPServer) {
@@ -105,6 +121,21 @@ func registerNatsHooks(lifecycle fx.Lifecycle, client *client.NatsClient) {
 			},
 			OnStop: func(context.Context) error {
 				client.Disconnect()
+				return nil
+			},
+		},
+	)
+}
+
+func registerMinioHooks(lifecycle fx.Lifecycle, client *client.MinioClient) {
+	lifecycle.Append(
+		fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				if err := client.Connect(ctx); err != nil {
+					logrus.Fatalf("error connecting minio: %s", err.Error())
+					return err
+				}
+
 				return nil
 			},
 		},

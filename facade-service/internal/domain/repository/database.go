@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sirupsen/logrus"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 )
 
 type PostgresDB struct {

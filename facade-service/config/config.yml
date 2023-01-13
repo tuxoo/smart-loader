@@ -17,6 +17,9 @@ postgres:
 nats:
   port: 4222
 
+minio:
+  endpoint:
+
 app:
   uriPartitionSize: 3
   tokenTtl: 180m

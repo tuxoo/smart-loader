@@ -35,3 +35,27 @@ func scanJob(row pgx.Row) (job model.Job, err error) {
 	}
 	return
 }
+
+func scanDownloads(rows pgx.Rows) (downloads []model.Download, err error) {
+	for rows.Next() {
+		download, err := scanDownload(rows)
+		if err != nil {
+			return downloads, err
+		}
+		downloads = append(downloads, download)
+	}
+
+	return
+}
+
+func scanDownload(row pgx.Row) (download model.Download, err error) {
+	if err = row.Scan(
+		&download.Id,
+		&download.Hash,
+		&download.DownloadedAt,
+		&download.Size,
+	); err != nil {
+		return
+	}
+	return
+}

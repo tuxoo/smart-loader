@@ -7,17 +7,31 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
 )
 
-type IUserRepository interface {
-	FindByCredentials(ctx context.Context, email, password string) (model.User, error)
-}
+const (
+	jobTable              = "job"
+	jobStageTable         = "job_stage"
+	jobStageDownloadTable = "job_stage_download"
+	downloadTable         = "download"
+	userTable             = "\"user\""
+)
 
-type IJobRepository interface {
-	CreateTransaction(ctx context.Context) (pgx.Tx, error)
-	FindAll(ctx context.Context, userId int) ([]model.Job, error)
-	SaveInTransaction(ctx context.Context, tx pgx.Tx, job model.Job) error
-}
+type (
+	IUserRepository interface {
+		FindByCredentials(ctx context.Context, email, password string) (model.User, error)
+	}
 
-type IJobStageRepository interface {
-	SaveInTransaction(ctx context.Context, tx pgx.Tx, jobStage model.JobStage) error
-	FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]int, error)
-}
+	IJobRepository interface {
+		CreateTransaction(ctx context.Context) (pgx.Tx, error)
+		FindAll(ctx context.Context, userId int) ([]model.Job, error)
+		SaveInTransaction(ctx context.Context, tx pgx.Tx, job model.Job) error
+	}
+
+	IJobStageRepository interface {
+		SaveInTransaction(ctx context.Context, tx pgx.Tx, jobStage model.JobStage) error
+		FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]int, error)
+	}
+
+	IDownloadRepository interface {
+		FindAllByJobId(ctx context.Context, jobId uuid.UUID, userId int) ([]model.Download, error)
+	}
+)

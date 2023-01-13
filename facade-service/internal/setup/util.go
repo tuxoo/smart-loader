@@ -1,7 +1,7 @@
 package setup
 
 import (
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/util/hasher"
 	token_manager "github.com/tuxoo/smart-loader/facade-service/internal/util/token-manager"
 )

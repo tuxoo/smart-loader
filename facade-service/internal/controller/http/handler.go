@@ -7,7 +7,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/swag/example/basic/docs"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/service"
 	token_manager "github.com/tuxoo/smart-loader/facade-service/internal/util/token-manager"
 	"net/http"
@@ -18,6 +18,7 @@ type Handler struct {
 	userService     service.IUserService
 	jobService      service.IJobService
 	jobStageService service.IJobStageService
+	downloadService service.IDownloadService
 	tokenManager    token_manager.TokenManager
 }
 
@@ -26,12 +27,14 @@ func NewHandler(
 	userService service.IUserService,
 	jobService service.IJobService,
 	jobStageService service.IJobStageService,
+	downloadService service.IDownloadService,
 	tokenManager token_manager.TokenManager,
 ) *gin.Engine {
 	handler := &Handler{
 		userService:     userService,
 		jobService:      jobService,
 		jobStageService: jobStageService,
+		downloadService: downloadService,
 		tokenManager:    tokenManager,
 	}
 
@@ -76,8 +79,8 @@ func (h *Handler) Init() *gin.Engine {
 func (h *Handler) initApi(router *gin.Engine) {
 	api := router.Group("/api/v1")
 	{
-		h.initJobRoutes(api)
 		h.initUserRoutes(api)
+		h.initJobRoutes(api)
 	}
 }
 

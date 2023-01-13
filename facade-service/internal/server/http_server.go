@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kavu/go_reuseport"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 	"net/http"
 )
 

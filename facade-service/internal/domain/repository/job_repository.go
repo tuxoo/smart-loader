@@ -7,8 +7,6 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
 )
 
-const jobTable = "job"
-
 type JobRepository struct {
 	db *PostgresDB
 }

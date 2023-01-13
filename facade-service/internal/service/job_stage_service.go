@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/repository"
 )
 

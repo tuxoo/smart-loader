@@ -6,8 +6,6 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
 )
 
-const userTable = "\"user\""
-
 type UserRepository struct {
 	db *PostgresDB
 }

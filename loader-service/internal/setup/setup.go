@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/sirupsen/logrus"
 	"github.com/tuxoo/smart-loader/loader-service/internal/client"
-	"github.com/tuxoo/smart-loader/loader-service/internal/config"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/config"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/repository"
 	"github.com/tuxoo/smart-loader/loader-service/internal/handler"
 	"go.uber.org/fx"

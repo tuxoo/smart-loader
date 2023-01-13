@@ -2,7 +2,7 @@ package setup
 
 import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/client"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/repository"
 	"github.com/tuxoo/smart-loader/facade-service/internal/service"
 	"github.com/tuxoo/smart-loader/facade-service/internal/util/hasher"
@@ -19,4 +19,12 @@ func provideJobService(repository repository.IJobRepository, jobStageService ser
 
 func provideJobStageService(cfg *config.AppConfig, repository repository.IJobStageRepository) service.IJobStageService {
 	return service.NewJobStageService(cfg, repository)
+}
+
+func provideDownloadService(repository repository.IDownloadRepository, minioService service.IMinioService) service.IDownloadService {
+	return service.NewDownloadService(repository, minioService)
+}
+
+func provideMinioService(client *client.MinioClient) service.IMinioService {
+	return service.NewMinioService(client)
 }

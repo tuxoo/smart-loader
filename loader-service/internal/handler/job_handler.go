@@ -24,7 +24,7 @@ func NewJobHandler(client *client.NatsClient, jobService service.IJobStageServic
 
 func (h *JobHandler) Handle() error {
 	if _, err := h.client.Conn.Subscribe(NEW_JOB, func(msg *nats.Msg) {
-		jobId, err := uuid.FromBytes(msg.Data)
+		jobId, err := uuid.Parse(string(msg.Data))
 		if err != nil {
 			return
 		}

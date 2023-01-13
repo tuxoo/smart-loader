@@ -3,7 +3,7 @@ package client
 import (
 	"fmt"
 	"github.com/nats-io/nats.go"
-	"github.com/tuxoo/smart-loader/facade-service/internal/config"
+	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model/config"
 )
 
 //var e = nats.Connect()
