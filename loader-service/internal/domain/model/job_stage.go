@@ -15,6 +15,7 @@ type JobStage struct {
 }
 
 type BriefJobStage struct {
-	Id   int      `json:"-" db:"id"`
-	Urls []string `json:"urls" db:"urls" binding:"required"`
+	Id     int      `json:"-" db:"id"`
+	Status string   `json:"status" db:"status"`
+	Urls   []string `json:"urls" db:"urls" binding:"required"`
 }

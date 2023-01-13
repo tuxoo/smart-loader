@@ -6,7 +6,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/tuxoo/smart-loader/loader-service/internal/config"
-	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/const"
 )
 
 type MinioClient struct {
@@ -38,10 +38,10 @@ func (c *MinioClient) Connect(ctx context.Context) error {
 
 	c.Client = client
 
-	if ok, err := client.BucketExists(ctx, model.IMAGE_BUCKET); err != nil {
+	if ok, err := client.BucketExists(ctx, _const.IMAGE_BUCKET); err != nil {
 		return err
 	} else if !ok {
-		if err = client.MakeBucket(ctx, model.IMAGE_BUCKET, minio.MakeBucketOptions{}); err != nil {
+		if err = client.MakeBucket(ctx, _const.IMAGE_BUCKET, minio.MakeBucketOptions{}); err != nil {
 			return err
 		}
 	}

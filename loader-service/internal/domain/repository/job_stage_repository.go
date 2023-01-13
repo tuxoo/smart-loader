@@ -41,34 +41,11 @@ func (r *JobStageRepository) UpdateStatusInTransaction(ctx context.Context, tx p
 }
 
 func (r *JobStageRepository) FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]model.BriefJobStage, error) {
-	var stages []model.BriefJobStage
-
-	query := fmt.Sprintf("SELECT id, urls FROM %s WHERE job_id = $1", jobStageTable)
+	query := fmt.Sprintf("SELECT id, urls, status FROM %s WHERE job_id = $1", jobStageTable)
 	rows, err := r.db.pool.Query(ctx, query, jobId)
 	if err != nil {
 		return nil, err
 	}
 
-	for rows.Next() {
-		var stage model.BriefJobStage
-
-		if err = scanBriefJobStage(&stage, rows); err != nil {
-			return nil, err
-		}
-
-		stages = append(stages, stage)
-	}
-
-	return stages, nil
-}
-
-func scanBriefJobStage(stage *model.BriefJobStage, row pgx.Row) error {
-	if err := row.Scan(
-		&stage.Id,
-		&stage.Urls,
-	); err != nil {
-		return err
-	}
-
-	return nil
+	return scanBriefJobStages(rows)
 }

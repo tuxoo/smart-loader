@@ -9,6 +9,7 @@ import (
 
 type IJobService interface {
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
+	UpdateStatusByStages(ctx context.Context, id uuid.UUID, stages []model.BriefJobStage) error
 }
 
 type IJobStageService interface {

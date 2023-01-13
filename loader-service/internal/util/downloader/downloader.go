@@ -1,5 +1,7 @@
 package downloader
 
+import "io"
+
 type Downloader interface {
-	Download(url string) ([]byte, error)
+	Download(url string) (io.ReadCloser, error)
 }

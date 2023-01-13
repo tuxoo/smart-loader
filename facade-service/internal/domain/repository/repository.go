@@ -2,15 +2,9 @@ package repository
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/tuxoo/smart-loader/facade-service/internal/domain/model"
-)
-
-const (
-	userTable     = "\"user\""
-	jobTable      = "job"
-	jobStageTable = "job_stage"
-	downloadTable = "download"
 )
 
 type IUserRepository interface {
@@ -19,9 +13,10 @@ type IUserRepository interface {
 
 type IJobRepository interface {
 	CreateTransaction(ctx context.Context) (pgx.Tx, error)
-	Save(ctx context.Context, tx pgx.Tx, job model.Job) error
+	SaveInTransaction(ctx context.Context, tx pgx.Tx, job model.Job) error
 }
 
 type IJobStageRepository interface {
-	Save(ctx context.Context, tx pgx.Tx, jobStage model.JobStage) error
+	SaveInTransaction(ctx context.Context, tx pgx.Tx, jobStage model.JobStage) error
+	FindAllByJobId(ctx context.Context, jobId uuid.UUID) ([]int, error)
 }

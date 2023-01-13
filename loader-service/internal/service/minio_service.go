@@ -6,6 +6,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/tuxoo/smart-loader/loader-service/internal/client"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/const"
 )
 
 type MinioService struct {
@@ -21,7 +22,7 @@ func NewMinioService(client *client.MinioClient) *MinioService {
 func (s *MinioService) Put(ctx context.Context, content []byte, download *model.Download) error {
 	if _, err := s.minioClient.Client.PutObject(
 		ctx,
-		model.IMAGE_BUCKET,
+		_const.IMAGE_BUCKET,
 		download.Id.String(),
 		bytes.NewReader(content),
 		int64(download.Size),

@@ -4,10 +4,13 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model"
+	"github.com/tuxoo/smart-loader/loader-service/internal/domain/model/const"
 	"github.com/tuxoo/smart-loader/loader-service/internal/domain/repository"
 	"github.com/tuxoo/smart-loader/loader-service/internal/util/downloader"
 	"github.com/tuxoo/smart-loader/loader-service/internal/util/hasher"
+	"io"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -45,7 +48,7 @@ func NewJobStageService(
 }
 
 func (s *JobStageService) ProcessStages(ctx context.Context, jobId uuid.UUID) error {
-	if err := s.jobService.UpdateStatus(ctx, jobId, model.PENDING_STATUS); err != nil {
+	if err := s.jobService.UpdateStatus(ctx, jobId, _const.PENDING_STATUS); err != nil {
 		return err
 	}
 
@@ -54,47 +57,71 @@ func (s *JobStageService) ProcessStages(ctx context.Context, jobId uuid.UUID) er
 		return err
 	}
 
+	var wg sync.WaitGroup
+
 	for _, stage := range stages {
-		if ok := s.lockService.TryToLock(ctx, model.JOB_STAGE_LOCK, strconv.Itoa(stage.Id)); ok {
-			if err = s.repository.UpdateStatus(ctx, stage.Id, model.PENDING_STATUS); err != nil {
-				return err
-			}
+		wg.Add(1)
 
-			if err = s.processingStage(ctx, &stage); err != nil {
-				if err = s.repository.UpdateStatus(ctx, stage.Id, model.FAILED_STATUS); err != nil {
-					return err
+		go func(stage model.BriefJobStage) {
+			defer wg.Done()
+
+			var status string
+			if ok := s.lockService.TryToLock(ctx, _const.JOB_STAGE_LOCK, strconv.Itoa(stage.Id)); ok {
+				if err = s.processingStage(ctx, &stage); err != nil {
+					status = _const.FAILED_STATUS
+				} else {
+					status = _const.EXECUTED_STATUS
 				}
-				return err
-			}
 
-			if err = s.repository.UpdateStatus(ctx, stage.Id, model.EXECUTED_STATUS); err != nil {
-				return err
-			}
+				if err = s.repository.UpdateStatus(ctx, stage.Id, status); err != nil {
+					// TODO:
+				}
 
-			s.lockService.TryToUnlock(ctx, model.JOB_STAGE_LOCK, strconv.Itoa(stage.Id))
-		} else {
-			continue
-		}
+				s.lockService.TryToUnlock(ctx, _const.JOB_STAGE_LOCK, strconv.Itoa(stage.Id))
+			}
+		}(stage)
 	}
 
-	return nil
+	wg.Wait()
+
+	stages, err = s.repository.FindAllByJobId(ctx, jobId)
+	if err != nil {
+		return err
+	}
+
+	return s.jobService.UpdateStatusByStages(ctx, jobId, stages)
 }
 
 func (s *JobStageService) processingStage(ctx context.Context, stage *model.BriefJobStage) error {
 	for _, url := range stage.Urls {
-		content, err := s.downloader.Download(url)
+		if err := s.repository.UpdateStatus(ctx, stage.Id, _const.PENDING_STATUS); err != nil {
+			return err
+		}
+
+		reader, err := s.downloader.Download(url)
 		if err != nil {
+			return err
+		}
+
+		content, err := io.ReadAll(reader)
+		if err != nil {
+			return err
+		}
+
+		if err = reader.Close(); err != nil {
 			return err
 		}
 
 		hash := s.hasher.HashBytes(content)
 		download, err := s.downloadService.GetByHash(ctx, hash)
 		if err != nil {
-			continue
+			return err
 		}
 
 		if download != nil {
-			_ = s.jobStageDownloadService.Save(ctx, stage.Id, download.Id)
+			if err = s.jobStageDownloadService.Save(ctx, stage.Id, download.Id); err != nil {
+				return err
+			}
 			continue
 		}
 
@@ -106,7 +133,7 @@ func (s *JobStageService) processingStage(ctx context.Context, stage *model.Brie
 		}
 
 		if err = s.minioService.Put(ctx, content, download); err != nil {
-			continue
+			return err
 		}
 
 		tx, err := s.repository.CreateTransaction(ctx)

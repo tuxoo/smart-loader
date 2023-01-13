@@ -46,7 +46,7 @@ func (s *JobService) Create(ctx context.Context, userId int, urls []string) (*mo
 		UserId:    userId,
 	}
 
-	err = s.repository.Save(ctx, tx, job)
+	err = s.repository.SaveInTransaction(ctx, tx, job)
 	if err != nil {
 		return nil, err
 	}

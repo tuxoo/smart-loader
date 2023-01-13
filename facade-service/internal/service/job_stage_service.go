@@ -33,12 +33,16 @@ func (s *JobStageService) Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID
 			JobId:  jobId,
 		}
 
-		if err := s.repository.Save(ctx, tx, jobStage); err != nil {
+		if err := s.repository.SaveInTransaction(ctx, tx, jobStage); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (s *JobStageService) GetAllByJobId(ctx context.Context, jobId uuid.UUID) ([]int, error) {
+	return s.repository.FindAllByJobId(ctx, jobId)
 }
 
 func partitioningUrls(urls []string, partitionSize int) (partitions [][]string) {

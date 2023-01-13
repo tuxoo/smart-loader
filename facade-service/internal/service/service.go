@@ -17,4 +17,5 @@ type IJobService interface {
 
 type IJobStageService interface {
 	Create(ctx context.Context, tx pgx.Tx, jobId uuid.UUID, urls []string) error
+	GetAllByJobId(ctx context.Context, jobId uuid.UUID) ([]int, error)
 }
