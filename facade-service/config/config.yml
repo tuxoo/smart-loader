@@ -22,4 +22,6 @@ minio:
 
 app:
   uriPartitionSize: 3
-  tokenTtl: 180m
+  tokensLimit: 3
+  accessTokenTtl: 10m
+  refreshTokenTtl: 72h

@@ -25,6 +25,7 @@ var repositoryModule = fx.Options(
 	fx.Provide(repository.NewPostgresDB),
 	fx.Provide(
 		provideUserRepository,
+		provideTokenRepository,
 		provideJobRepository,
 		provideJobStageRepository,
 		provideDownloadRepository,
@@ -34,6 +35,7 @@ var repositoryModule = fx.Options(
 var serviceModule = fx.Options(
 	fx.Provide(
 		provideUserService,
+		provideTokenService,
 		provideJobService,
 		provideJobStageService,
 		provideDownloadService,

@@ -10,8 +10,14 @@ import (
 
 type (
 	IUserService interface {
-		SignIn(ctx context.Context, dto model.SignInDTO) (string, error)
+		SignIn(ctx context.Context, dto model.SignInDTO) (tokens model.Tokens, err error)
 		GetById(ctx context.Context, id int) (model.User, error)
+		RefreshToken(ctx context.Context, userId int, token uuid.UUID) (tokens model.Tokens, err error)
+	}
+
+	ITokenService interface {
+		CreateNewToken(ctx context.Context, userId int) (uuid.UUID, error)
+		RefreshToken(ctx context.Context, token uuid.UUID) (uuid.UUID, error)
 	}
 
 	IJobService interface {

@@ -6,6 +6,10 @@ func provideUserRepository(db *repository.PostgresDB) repository.IUserRepository
 	return repository.NewUserRepository(db)
 }
 
+func provideTokenRepository(db *repository.PostgresDB) repository.ITokenRepository {
+	return repository.NewTokenRepository(db)
+}
+
 func provideJobRepository(db *repository.PostgresDB) repository.IJobRepository {
 	return repository.NewJobRepository(db)
 }

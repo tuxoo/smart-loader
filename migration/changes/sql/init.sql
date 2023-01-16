@@ -14,6 +14,14 @@ INSERT INTO "user" (name, login_email, password_hash, registered_at, visited_at)
 VALUES ('admin', 'admin@mail.ru', '326236336132646265e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5',
         now(), now());
 
+CREATE TABLE token
+(
+    id         uuid default gen_random_uuid() primary key,
+    expired_at timestamp           not null,
+    user_id    bigint
+        constraint fk_user references "user" not null
+);
+
 CREATE TABLE job
 (
     id         uuid default gen_random_uuid() primary key,

@@ -13,6 +13,7 @@ const (
 	jobStageDownloadTable = "job_stage_download"
 	downloadTable         = "download"
 	userTable             = "\"user\""
+	tokenTable            = "token"
 )
 
 type (
@@ -20,6 +21,13 @@ type (
 		FindByCredentials(ctx context.Context, email, password string) (model.User, error)
 		UpdateLastVisit(ctx context.Context, id int) (err error)
 		FindById(ctx context.Context, id int) (model.User, error)
+	}
+
+	ITokenRepository interface {
+		SaveOne(ctx context.Context, token model.Token) (uuid.UUID, error)
+		FindAllByUser(ctx context.Context, userId int) ([]model.Token, error)
+		DeleteByUser(ctx context.Context, userId int) (err error)
+		UpdateToken(ctx context.Context, token model.Token) (uuid.UUID, error)
 	}
 
 	IJobRepository interface {

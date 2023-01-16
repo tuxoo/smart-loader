@@ -57,5 +57,30 @@ func scanDownload(row pgx.Row) (download model.Download, err error) {
 	); err != nil {
 		return
 	}
+
+	return
+}
+
+func scanTokens(rows pgx.Rows) (tokens []model.Token, err error) {
+	for rows.Next() {
+		token, err := scanToken(rows)
+		if err != nil {
+			return tokens, err
+		}
+		tokens = append(tokens, token)
+	}
+
+	return
+}
+
+func scanToken(row pgx.Row) (token model.Token, err error) {
+	if err = row.Scan(
+		&token.Id,
+		&token.ExpiredAt,
+		&token.UserId,
+	); err != nil {
+		return
+	}
+
 	return
 }

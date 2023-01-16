@@ -11,5 +11,5 @@ func provideHasher(cfg *config.AppConfig) hasher.Hasher {
 }
 
 func provideTokenManager(cfg *config.AppConfig) token_manager.TokenManager {
-	return token_manager.NewJWTTokenManager(cfg.TokenTTL, cfg.SigningKey)
+	return token_manager.NewJWTTokenManager(cfg.AccessTokenTTL, cfg.SigningKey)
 }

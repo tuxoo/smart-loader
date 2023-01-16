@@ -9,7 +9,9 @@ import (
 type AppConfig struct {
 	HashSalt         string
 	UriPartitionSize int
-	TokenTTL         time.Duration
+	TokensLimit      int
+	AccessTokenTTL   time.Duration
+	RefreshTokenTTL  time.Duration
 	SigningKey       string
 }
 
@@ -31,7 +33,9 @@ func NewAppConfig() (cfg *AppConfig) {
 
 	cfg.HashSalt = viper.GetString("app.hashSalt")
 	cfg.UriPartitionSize = viper.GetInt("app.uriPartitionSize")
-	cfg.TokenTTL = viper.GetDuration("app.tokenTtl")
+	cfg.TokensLimit = viper.GetInt("app.tokensLimit")
+	cfg.AccessTokenTTL = viper.GetDuration("app.accessTokenTtl")
+	cfg.RefreshTokenTTL = viper.GetDuration("app.refreshTokenTtl")
 	cfg.SigningKey = viper.GetString("app.signingKey")
 
 	return

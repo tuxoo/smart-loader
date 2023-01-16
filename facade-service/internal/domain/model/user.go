@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type SignInDTO struct {
 	Email    string `json:"email" binding:"required,email,max=64"`

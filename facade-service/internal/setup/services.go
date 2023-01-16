@@ -9,19 +9,41 @@ import (
 	"github.com/tuxoo/smart-loader/facade-service/internal/util/token-manager"
 )
 
-func provideUserService(repository repository.IUserRepository, hasher hasher.Hasher, tokenManager token_manager.TokenManager) service.IUserService {
-	return service.NewUserService(repository, hasher, tokenManager)
+func provideUserService(
+	repository repository.IUserRepository,
+	hasher hasher.Hasher,
+	tokenManager token_manager.TokenManager,
+	tokenService service.ITokenService,
+) service.IUserService {
+	return service.NewUserService(repository, hasher, tokenManager, tokenService)
 }
 
-func provideJobService(repository repository.IJobRepository, jobStageService service.IJobStageService, natsClient *client.NatsClient) service.IJobService {
+func provideTokenService(
+	cfg *config.AppConfig,
+	repository repository.ITokenRepository,
+) service.ITokenService {
+	return service.NewTokenService(cfg, repository)
+}
+
+func provideJobService(
+	repository repository.IJobRepository,
+	jobStageService service.IJobStageService,
+	natsClient *client.NatsClient,
+) service.IJobService {
 	return service.NewJobService(repository, jobStageService, natsClient)
 }
 
-func provideJobStageService(cfg *config.AppConfig, repository repository.IJobStageRepository) service.IJobStageService {
+func provideJobStageService(
+	cfg *config.AppConfig,
+	repository repository.IJobStageRepository,
+) service.IJobStageService {
 	return service.NewJobStageService(cfg, repository)
 }
 
-func provideDownloadService(repository repository.IDownloadRepository, minioService service.IMinioService) service.IDownloadService {
+func provideDownloadService(
+	repository repository.IDownloadRepository,
+	minioService service.IMinioService,
+) service.IDownloadService {
 	return service.NewDownloadService(repository, minioService)
 }
 
