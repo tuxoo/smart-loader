@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -66,19 +65,19 @@ func (h *Handler) getDownloads(c *gin.Context) {
 
 	id := c.Param("id")
 	if id == "" {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Sprint("job id was absent"))
+		newErrorResponse(c, http.StatusBadRequest, "job id was absent")
 		return
 	}
 
 	jobId, err := uuid.Parse(id)
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Sprint("job id was uncorrected"))
+		newErrorResponse(c, http.StatusBadRequest, "job id was uncorrected")
 		return
 	}
 
 	content, err := h.downloadService.GetDownloadZip(c.Request.Context(), jobId, userId)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, fmt.Sprint("something went wrong"))
+		newErrorResponse(c, http.StatusInternalServerError, "something went wrong")
 		return
 	}
 

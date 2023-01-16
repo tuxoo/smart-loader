@@ -29,5 +29,13 @@ func (s *UserService) SignIn(ctx context.Context, dto model.SignInDTO) (token st
 		return
 	}
 
+	if err = s.repository.UpdateLastVisit(ctx, user.Id); err != nil {
+		return "", err
+	}
+
 	return s.tokenManager.GenerateToken(strconv.Itoa(user.Id))
+}
+
+func (s *UserService) GetById(ctx context.Context, id int) (model.User, error) {
+	return s.repository.FindById(ctx, id)
 }

@@ -11,10 +11,10 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 	{
 		user.POST("/sign-in/", h.signIn)
 
-		//authenticated := user.Group("/", h.userIdentity)
-		//{
-		//	authenticated.GET("/profile/", h.getUserProfile)
-		//}
+		authenticated := user.Group("/", h.userIdentity)
+		{
+			authenticated.GET("/", h.getUserProfile)
+		}
 	}
 }
 
@@ -32,7 +32,23 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]any{
+	c.JSON(http.StatusOK, gin.H{
 		"token": token,
 	})
+}
+
+func (h *Handler) getUserProfile(c *gin.Context) {
+	id, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "unauthorized user")
+		return
+	}
+
+	user, err := h.userService.GetById(c.Request.Context(), id)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "unauthorized user")
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

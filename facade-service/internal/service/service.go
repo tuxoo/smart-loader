@@ -11,6 +11,7 @@ import (
 type (
 	IUserService interface {
 		SignIn(ctx context.Context, dto model.SignInDTO) (string, error)
+		GetById(ctx context.Context, id int) (model.User, error)
 	}
 
 	IJobService interface {

@@ -18,6 +18,8 @@ const (
 type (
 	IUserRepository interface {
 		FindByCredentials(ctx context.Context, email, password string) (model.User, error)
+		UpdateLastVisit(ctx context.Context, id int) (err error)
+		FindById(ctx context.Context, id int) (model.User, error)
 	}
 
 	IJobRepository interface {
